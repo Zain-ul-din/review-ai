@@ -4,10 +4,10 @@ import "./globals.css";
 
 import {
   ClerkProvider,
-  SignedIn,
+  // SignedIn,
   SignedOut,
-  SignInButton,
-  UserButton
+  SignInButton
+  // UserButton
 } from "@clerk/nextjs";
 
 const geistSans = localFont({
@@ -40,9 +40,9 @@ export default function RootLayout({
           <SignedOut>
             <SignInButton forceRedirectUrl={"/dashboard"} />
           </SignedOut>
-          <SignedIn>
+          {/* <SignedIn>
             <UserButton />
-          </SignedIn>
+          </SignedIn> */}
           {children}
         </body>
       </html>

@@ -6,8 +6,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="w-full h-full">
-        <SidebarTrigger />
+      <main className="w-full h-full relative">
+        <div className="absolute top-2 left-2 z-[100]">
+          <SidebarTrigger />
+        </div>
         {children}
       </main>
     </SidebarProvider>

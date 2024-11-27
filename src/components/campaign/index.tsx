@@ -18,11 +18,15 @@ import { useShapeConfetti } from "@/hooks/use-shape-confetti";
 interface CampaignProps {
   ctaText: string;
   onFeedbackBtnClick?: () => void;
+  orgName: string;
+  avatar: string;
 }
 
 export default function Campaign({
   ctaText,
-  onFeedbackBtnClick
+  onFeedbackBtnClick,
+  orgName,
+  avatar
 }: CampaignProps) {
   const triggerShapeConfetti = useShapeConfetti();
 
@@ -43,9 +47,9 @@ export default function Campaign({
       >
         <h1 className="text-2xl flex items-center gap-2">
           <Avatar>
-            <AvatarImage src="/temp/orbisdev-logo.png" alt="orbisdev logo" />
+            <AvatarImage src={avatar} alt="orbisdev logo" />
           </Avatar>
-          OrbisDev
+          {orgName}
         </h1>
 
         {/* <p className="text-2xl text-center py-8">

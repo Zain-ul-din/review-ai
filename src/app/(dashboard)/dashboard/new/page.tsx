@@ -16,6 +16,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { usePagination } from "react-use-pagination";
+import { useUser } from "@clerk/nextjs";
 
 const formSchema = z.object({
   ctaText: z.string().min(1, { message: "CTA text should be less than " })
@@ -25,6 +26,8 @@ type FormType = z.infer<typeof formSchema>;
 
 export default function NewCampaignPage() {
   const [isPopOverOpen, setIsPopOverOpen] = useState(false);
+
+  const user = useUser();
 
   const {
     currentPage,
@@ -48,6 +51,8 @@ export default function NewCampaignPage() {
           case 0:
             return (
               <Campaign
+                orgName={user.user?.fullName || ""}
+                avatar={user.user?.imageUrl || ""}
                 ctaText={
                   form.watch("ctaText") ||
                   `We’d love to hear your thoughts! Help us improve by sharing your
@@ -60,8 +65,8 @@ export default function NewCampaignPage() {
             );
           case 1:
             return (
-              <div className="max-w-lg mx-auto w-full p-2">
-                <FeedbackForm className="bg-card border p-4" />
+              <div className="max-w-lg mx-auto  w-full p-2">
+                <FeedbackForm className="bg-card rounded-lg border p-4" />
               </div>
             );
           default:

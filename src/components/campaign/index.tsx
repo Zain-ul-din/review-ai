@@ -33,9 +33,12 @@ export default function Campaign({
   return (
     <main
       className={cn(
-        "w-full min-h-[100svh] bg-gradient-to-bl from-indigo-100/90  via-pink-200/60 to-indigo-200/80",
+        "w-full min-h-[100svh]",
         "flex justify-center items-center p-4"
       )}
+      style={{
+        background: "var(--pink-indigo)"
+      }}
     >
       <div
         className={cn(
@@ -75,7 +78,7 @@ export default function Campaign({
                   <DialogTitle className="sr-only">
                     Submit Review Dialog
                   </DialogTitle>
-                  <FeedbackForm />
+                  <FeedbackForm ratingComponent="star" />
                 </DialogContent>
               </Dialog>
             )}

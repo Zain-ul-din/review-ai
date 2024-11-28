@@ -1,13 +1,22 @@
 import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import confetti from "canvas-confetti";
 import { TextureButton } from "../ui/texture-button";
 import { cn } from "@/lib/utils";
+import StarRating from "../ui/star-rating";
+import EmojiRating from "../ui/emoji-rating";
 
-export const FeedbackForm = ({ className }: { className?: string }) => {
+export const FeedbackForm = ({
+  className,
+  ratingComponent,
+  readonly
+}: {
+  className?: string;
+  readonly?: boolean;
+  ratingComponent: "star" | "emoji";
+}) => {
   const form = useForm();
 
   const handleClick = () => {
@@ -54,27 +63,22 @@ export const FeedbackForm = ({ className }: { className?: string }) => {
                   Overall Rating
                 </FormLabel>
 
-                <div className="flex gap-4">
-                  {new Array(5).fill(0).map((v, i) => {
-                    return (
-                      <span
-                        key={i}
-                        className={cn(
-                          "bg-muted p-2 border cursor-pointer border-muted-foreground/40 rounded-md"
-                        )}
-                        onClick={() => {
-                          if (i == 4) handleClick();
-                        }}
-                      >
-                        <Star
-                          className={cn(
-                            i < 4 && "text-yellow-500 fill-yellow-300"
-                          )}
+                {(() => {
+                  switch (ratingComponent) {
+                    case "star":
+                      return (
+                        <StarRating
+                          onRate={(rating) => {
+                            if (rating === 5 && !readonly) {
+                              handleClick();
+                            }
+                          }}
                         />
-                      </span>
-                    );
-                  })}
-                </div>
+                      );
+                    case "emoji":
+                      return <EmojiRating />;
+                  }
+                })()}
               </FormItem>
             );
           }}
@@ -86,7 +90,10 @@ export const FeedbackForm = ({ className }: { className?: string }) => {
           render={() => (
             <FormItem>
               <FormLabel className="text-lg">Review title</FormLabel>
-              <Input placeholder="Example: Easy to use" className="py-6" />
+              <Input
+                placeholder="Give a title to your review"
+                className="py-6"
+              />
             </FormItem>
           )}
         />
@@ -106,14 +113,18 @@ export const FeedbackForm = ({ className }: { className?: string }) => {
                 im feeling happy.
               </div> */}
               <Textarea
-                placeholder="Example: This product exceeded my expectations! Great quality and fast shipping."
+                placeholder="Share your thoughts here..."
                 className="py-4 max-h-[200px]"
               />
             </FormItem>
           )}
         />
 
-        <TextureButton size="lg">Submit</TextureButton>
+        {!readonly && (
+          <>
+            <TextureButton size="lg">Submit</TextureButton>
+          </>
+        )}
       </form>
     </Form>
   );

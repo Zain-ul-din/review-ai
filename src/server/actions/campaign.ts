@@ -5,6 +5,10 @@ import {
   CampaignFormType
 } from "@/shared/definitions/campaign";
 import { auth } from "@clerk/nextjs/server";
+import { getDB } from "../db";
+import { ROUTES } from "@/lib/constants";
+import { redirect } from "next/navigation";
+import { collections } from "../db/collections";
 
 export async function createCampaign(data: CampaignFormType) {
   const validateFields = campaignFormSchema.safeParse(data);
@@ -21,8 +25,13 @@ export async function createCampaign(data: CampaignFormType) {
     throw new Error(`No user currently logged In`);
   }
 
-  await new Promise((r) => setTimeout(r, 2000));
+  const db = await getDB();
+  await db.collection(collections.campaigns).insertOne({
+    ...data,
+    userId,
+    createdAt: new Date().toISOString(),
+    updateAt: new Date().toISOString()
+  });
 
-  // write data to db
-  console.log(userId, " : ", data);
+  redirect(ROUTES.dashboard);
 }

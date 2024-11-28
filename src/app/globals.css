@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  font-family: var(--playfairFont), sans-serif, Arial, Helvetica;
+  font-family: var(--loraFont), sans-serif, Arial, Helvetica;
 }
 
 @layer base {

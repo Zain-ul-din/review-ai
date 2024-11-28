@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair } from "next/font/google";
+import { Playfair, Lora } from "next/font/google";
 import "./globals.css";
 
 import {
@@ -9,6 +9,12 @@ import {
   // SignInButton
   // UserButton
 } from "@clerk/nextjs";
+
+const loraFont = Lora({
+  variable: "--loraFont",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"]
+});
 
 const playfairFont = Playfair({
   variable: "--playfairFont",
@@ -29,7 +35,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${playfairFont.variable} antialiased`}>
+        <body
+          className={`${playfairFont.variable} ${loraFont.variable} antialiased`}
+        >
           {/* <SignedOut>
             <SignInButton forceRedirectUrl={"/dashboard"} />
           </SignedOut> */}

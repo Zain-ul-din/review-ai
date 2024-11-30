@@ -1,4 +1,6 @@
 export const ROUTES = {
   dashboard: "/dashboard",
-  newCampaign: "/dashboard/new"
+  newCampaign: "/dashboard/new",
+  signIn: "/sign-in",
+  signUp: "/sign-up",
 };

@@ -1,3 +1,4 @@
+"use client";
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
 
 import {
@@ -8,49 +9,57 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { ROUTES } from "@/lib/constants";
+import { usePathname } from "next/navigation";
 
 // Menu items.
 const items = [
   {
     title: "Home",
-    url: "/dashboard",
-    icon: Home
+    url: ROUTES.dashboard,
+    icon: Home,
   },
   {
     title: "Inbox",
     url: "#",
-    icon: Inbox
+    icon: Inbox,
   },
   {
     title: "Calendar",
     url: "#",
-    icon: Calendar
+    icon: Calendar,
   },
   {
     title: "Search",
     url: "#",
-    icon: Search
+    icon: Search,
   },
   {
     title: "Settings",
     url: "#",
-    icon: Settings
-  }
+    icon: Settings,
+  },
 ];
 
 export function AppSidebar() {
+  const pathname = usePathname();
+
   return (
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel className="my-4">Dashboard</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                <SidebarMenuItem className="px-2" key={item.title}>
+                  <SidebarMenuButton
+                    variant={pathname === item.url ? "outline" : "default"}
+                    isActive={pathname === item.url}
+                    asChild
+                  >
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>

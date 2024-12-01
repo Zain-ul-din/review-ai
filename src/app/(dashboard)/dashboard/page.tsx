@@ -6,7 +6,7 @@ import {
   Card,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@/components/ui/card";
 import DashboardLayout from "@/components/layout/dashboard";
 
@@ -28,7 +28,7 @@ export default async function Dashboard() {
       <div className="sm:columns-2 md:columns-3">
         {campaigns.map((campaign, i) => (
           <Link
-            href={`/review/${campaign._id}`}
+            href={`${ROUTES.campaign}/${campaign._id}`}
             className="break-inside-avoid"
             key={i}
           >

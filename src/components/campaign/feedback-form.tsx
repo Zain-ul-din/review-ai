@@ -8,15 +8,18 @@ import { cn } from "@/lib/utils";
 import StarRating from "../ui/star-rating";
 import EmojiRating from "../ui/emoji-rating";
 
-export const FeedbackForm = ({
-  className,
-  ratingComponent,
-  readonly
-}: {
+export type FeedbackFormProps = {
   className?: string;
   readonly?: boolean;
   ratingComponent: "star" | "emoji";
-}) => {
+  id?: string;
+};
+
+export const FeedbackForm = ({
+  className,
+  ratingComponent,
+  readonly,
+}: FeedbackFormProps) => {
   const form = useForm();
 
   const handleClick = () => {
@@ -26,7 +29,7 @@ export const FeedbackForm = ({
       gravity: 0,
       decay: 0.94,
       startVelocity: 30,
-      colors: ["#FFE400", "#FFBD00", "#E89400", "#FFCA6C", "#FDFFB8"]
+      colors: ["#FFE400", "#FFBD00", "#E89400", "#FFCA6C", "#FDFFB8"],
     };
 
     const shoot = () => {
@@ -34,14 +37,14 @@ export const FeedbackForm = ({
         ...defaults,
         particleCount: 40,
         scalar: 1.2,
-        shapes: ["star"]
+        shapes: ["star"],
       });
 
       confetti({
         ...defaults,
         particleCount: 10,
         scalar: 0.75,
-        shapes: ["circle"]
+        shapes: ["circle"],
       });
     };
 

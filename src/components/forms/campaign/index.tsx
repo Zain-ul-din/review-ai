@@ -1,12 +1,12 @@
 "use client";
-import Campaign from "@/components/campaign";
+import { CampaignIntro } from "@/components/campaign/intro";
 import { FeedbackForm } from "@/components/campaign/feedback-form";
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import {
   Popover,
   PopoverContent,
-  PopoverTrigger
+  PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -21,17 +21,22 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 import {
   campaignFormSchema,
-  CampaignFormType
+  CampaignFormType,
 } from "@/shared/definitions/campaign";
 
-import { createCampaign } from "@/server/actions/campaign";
+import { createCampaign, updateCampaign } from "@/server/actions/campaign";
 import { MetadataForm } from "./metadata";
+import { CampaignType } from "@/types";
 
-export default function CampaignForm() {
+export default function CampaignForm({
+  defaultValues,
+}: {
+  defaultValues?: CampaignType;
+}) {
   const [isPopOverOpen, setIsPopOverOpen] = useState(false);
   const user = useUser();
 
@@ -42,19 +47,19 @@ export default function CampaignForm() {
     nextEnabled,
     setPreviousPage,
     previousEnabled,
-    setNextPage
+    setNextPage,
   } = usePagination({
     totalItems: 3,
-    initialPageSize: 1
+    initialPageSize: 1,
   });
 
   const form = useForm<CampaignFormType>({
     resolver: zodResolver(campaignFormSchema),
-    defaultValues: {
+    defaultValues: defaultValues || {
       name: "",
       description: "",
-      ratingComponentType: "star"
-    }
+      ratingComponentType: "star",
+    },
   });
 
   const [loading, startTransition] = useTransition();
@@ -72,7 +77,7 @@ export default function CampaignForm() {
     <div
       className="relative min-h-[100svh] flex items-center"
       style={{
-        background: "var(--pink-indigo)"
+        background: "var(--pink-indigo)",
       }}
     >
       {(() => {
@@ -88,14 +93,15 @@ export default function CampaignForm() {
                 }}
                 defaultValues={{
                   name: form.watch("name"),
-                  description: form.watch("description")
+                  description: form.watch("description"),
                 }}
                 ref={formRef}
+                editable={defaultValues !== undefined}
               />
             );
           case 1:
             return (
-              <Campaign
+              <CampaignIntro
                 orgName={user.user?.fullName || ""}
                 avatar={user.user?.imageUrl || ""}
                 ctaText={form.watch("ctaText")}
@@ -222,11 +228,17 @@ export default function CampaignForm() {
           <Button
             className="text-xl"
             onClick={() => {
-              console.log("clicked");
               form.handleSubmit((data) => {
-                startTransition(async () => {
-                  await createCampaign(data);
-                });
+                if (defaultValues) {
+                  // submit edit request
+                  startTransition(async () => {
+                    await updateCampaign(defaultValues._id as string, data);
+                  });
+                } else {
+                  startTransition(async () => {
+                    await createCampaign(data);
+                  });
+                }
               })();
             }}
             disabled={nextEnabled || loading}

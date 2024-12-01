@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { getDB } from "../db";
 import { collections } from "../db/collections";
 import { ObjectId } from "mongodb";
+import { CampaignType } from "@/types";
 
 export async function getAllCampaigns() {
   const { userId } = await auth();
@@ -18,9 +19,11 @@ export async function getAllCampaigns() {
 export async function getCampaignById(id: string) {
   const db = await getDB();
 
-  const campaign = await db.collection(collections.campaigns).findOne({
-    _id: new ObjectId(id)
-  });
+  const campaign = await db
+    .collection<CampaignType>(collections.campaigns)
+    .findOne({
+      _id: new ObjectId(id),
+    });
 
   return campaign;
 }

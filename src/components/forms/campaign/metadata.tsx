@@ -13,20 +13,23 @@ type FormType = z.infer<typeof composedCampaignSchema.metadata>;
 interface Props extends HtmlHTMLAttributes<HTMLFormElement> {
   handleSubmit: (data: FormType) => void;
   defaultValues: FormType;
+  editable?: boolean;
 }
 
 export const MetadataForm = forwardRef<HTMLFormElement, Props>(
-  ({ handleSubmit, defaultValues, ...rest }, ref) => {
+  ({ editable, handleSubmit, defaultValues, ...rest }, ref) => {
     const form = useForm<FormType>({
       resolver: zodResolver(composedCampaignSchema.metadata),
-      defaultValues
+      defaultValues,
     });
 
     return (
       <>
         <div className="max-w-lg mx-auto w-full p-2">
           <div className="bg-card rounded-md border p-4 space-y-6">
-            <h2 className="text-2xl">Create New Campaign</h2>
+            <h2 className="text-2xl">
+              {editable ? <>Edit Campaign</> : <>Create New Campaign</>}
+            </h2>
 
             <Form {...form}>
               <form

@@ -1,5 +1,5 @@
 "use client";
-import { Calendar, Home, Search, Settings, Star } from "lucide-react";
+import { Home, MessageCircle, Star } from "lucide-react";
 
 import {
   Sidebar,
@@ -27,20 +27,26 @@ const items = [
     icon: Star,
   },
   {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
+    title: "Feedback",
+    url: ROUTES.feedback,
+    icon: MessageCircle,
   },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
+  // Not planned atm
+  // {
+  //   title: "Calendar",
+  //   url: "#",
+  //   icon: Calendar,
+  // },
+  // {
+  //   title: "Search",
+  //   url: "#",
+  //   icon: Search,
+  // },
+  // {
+  //   title: "Settings",
+  //   url: "#",
+  //   icon: Settings,
+  // },
 ];
 
 export function AppSidebar() {

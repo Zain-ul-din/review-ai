@@ -23,7 +23,7 @@ const items = [
   },
   {
     title: "New Campaign",
-    url: "#",
+    url: ROUTES.newCampaign,
     icon: Star,
   },
   {

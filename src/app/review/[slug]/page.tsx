@@ -26,5 +26,7 @@ export default async function ReviewPage({
 }) {
   const { slug } = await params;
   const { campaign, user } = await fetchData(slug);
-  return <Campaign campaign={campaign} owner={user} />;
+  return (
+    <Campaign campaign={JSON.parse(JSON.stringify(campaign))} owner={user} />
+  );
 }

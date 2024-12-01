@@ -16,11 +16,6 @@ export default function StarRating({ rating, onRate }: StarRatingProps) {
     setSelectedRating(rating || 0);
   }, [rating]);
 
-  useEffect(() => {
-    if (!onRate) return;
-    onRate(selectedRating);
-  }, [selectedRating, onRate]);
-
   return (
     <div className="flex gap-2">
       {new Array(5).fill(0).map((v, i) => {
@@ -45,6 +40,7 @@ export default function StarRating({ rating, onRate }: StarRatingProps) {
               }, 250);
             }}
             onClick={() => {
+              if (onRate) onRate(i + 1);
               setSelectedRating(i + 1);
             }}
           >

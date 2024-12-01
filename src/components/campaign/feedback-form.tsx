@@ -2,60 +2,76 @@ import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import confetti from "canvas-confetti";
 import { TextureButton } from "../ui/texture-button";
 import { cn } from "@/lib/utils";
 import StarRating from "../ui/star-rating";
 import EmojiRating from "../ui/emoji-rating";
+import { useStarsConfetti } from "@/hooks/use-stars-confetti";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  CampaignFeedbackFormType,
+  campaignFeedbackSchema,
+} from "@/shared/definitions/campaign-feedback";
+import { submitCampaignFeedback } from "@/server/actions/campaign-feedback";
+import { useTransition } from "react";
 
 export type FeedbackFormProps = {
   className?: string;
   readonly?: boolean;
   ratingComponent: "star" | "emoji";
   id?: string;
+  onSubmit?: () => void;
 };
 
 export const FeedbackForm = ({
   className,
   ratingComponent,
   readonly,
+  id,
+  onSubmit,
 }: FeedbackFormProps) => {
-  const form = useForm();
+  const form = useForm<CampaignFeedbackFormType>({
+    resolver: zodResolver(campaignFeedbackSchema),
+    defaultValues: {
+      rating: 0,
+      title: "",
+      review: "",
+      id,
+    },
+  });
 
-  const handleClick = () => {
-    const defaults = {
-      spread: 360,
-      ticks: 50,
-      gravity: 0,
-      decay: 0.94,
-      startVelocity: 30,
-      colors: ["#FFE400", "#FFBD00", "#E89400", "#FFCA6C", "#FDFFB8"],
-    };
-
-    const shoot = () => {
-      confetti({
-        ...defaults,
-        particleCount: 40,
-        scalar: 1.2,
-        shapes: ["star"],
-      });
-
-      confetti({
-        ...defaults,
-        particleCount: 10,
-        scalar: 0.75,
-        shapes: ["circle"],
-      });
-    };
-
-    setTimeout(shoot, 0);
-    setTimeout(shoot, 100);
-    setTimeout(shoot, 200);
-  };
+  const triggerStarConfetti = useStarsConfetti();
+  const [loading, startTransition] = useTransition();
 
   return (
     <Form {...form}>
-      <form className={cn("space-y-8", className)}>
+      <form
+        onSubmit={form.handleSubmit((data) => {
+          startTransition(async () => {
+            await submitCampaignFeedback(data);
+            if (onSubmit) onSubmit();
+          });
+        })}
+        className={cn("space-y-8", className)}
+      >
+        {/* 👋 Hello PHP in react world */}
+        <FormField
+          name="id"
+          control={form.control}
+          defaultValue={id}
+          render={({ field }) => {
+            return (
+              <Input
+                {...field}
+                value={id || ""}
+                className="hidden"
+                readOnly
+                hidden
+              />
+            );
+          }}
+        />
+
         <FormField
           name="rating"
           control={form.control}
@@ -72,14 +88,19 @@ export const FeedbackForm = ({
                       return (
                         <StarRating
                           onRate={(rating) => {
-                            if (rating === 5 && !readonly) {
-                              handleClick();
-                            }
+                            if (rating == 5 && !readonly) triggerStarConfetti();
+                            form.setValue("rating", rating);
                           }}
                         />
                       );
                     case "emoji":
-                      return <EmojiRating />;
+                      return (
+                        <EmojiRating
+                          onRate={(rating) => {
+                            form.setValue("rating", rating);
+                          }}
+                        />
+                      );
                   }
                 })()}
               </FormItem>
@@ -90,12 +111,13 @@ export const FeedbackForm = ({
         <FormField
           name="title"
           control={form.control}
-          render={() => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel className="text-lg">Review title</FormLabel>
               <Input
                 placeholder="Give a title to your review"
                 className="py-6"
+                {...field}
               />
             </FormItem>
           )}
@@ -104,7 +126,7 @@ export const FeedbackForm = ({
         <FormField
           name="review"
           control={form.control}
-          render={() => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel className="text-lg">Review</FormLabel>
               {/* <div className="flex flex-wrap items-end text-lg ">
@@ -118,6 +140,7 @@ export const FeedbackForm = ({
               <Textarea
                 placeholder="Share your thoughts here..."
                 className="py-4 max-h-[200px]"
+                {...field}
               />
             </FormItem>
           )}
@@ -125,7 +148,9 @@ export const FeedbackForm = ({
 
         {!readonly && (
           <>
-            <TextureButton size="lg">Submit</TextureButton>
+            <TextureButton type="submit" size="lg" isLoading={loading}>
+              Submit
+            </TextureButton>
           </>
         )}
       </form>

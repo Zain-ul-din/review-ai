@@ -1,3 +1,4 @@
 export const collections = {
-  campaigns: "campaigns"
+  campaigns: "campaigns",
+  campaignFeedbacks: "campaign_feedbacks",
 };

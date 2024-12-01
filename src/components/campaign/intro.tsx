@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { FeedbackForm, FeedbackFormProps } from "./feedback-form";
-import { useShapeConfetti } from "@/hooks/use-shape-confetti";
+// import { useShapeConfetti } from "@/hooks/use-shape-confetti";
 import { ArrowLeftRight, ArrowRight } from "lucide-react";
 import {
   SignedIn,
@@ -24,6 +24,7 @@ import {
 } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
+import { useState } from "react";
 
 interface CampaignProps {
   ctaText: string;
@@ -40,9 +41,12 @@ export function CampaignIntro({
   avatar,
   formProps,
 }: CampaignProps) {
-  const triggerShapeConfetti = useShapeConfetti();
+  // const triggerShapeConfetti = useShapeConfetti();
   const pathname = usePathname();
   const user = useUser();
+
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
 
   return (
     <main
@@ -58,7 +62,7 @@ export function CampaignIntro({
         className={cn(
           "max-w-[550px]",
           "rounded-lg  w-full bg-gradient-to-bl from-background via-background/80 to-background",
-          "border-2 p-6 sm:p-12 relative",
+          "border p-6 sm:p-12 relative",
           "space-y-6"
         )}
       >
@@ -69,57 +73,87 @@ export function CampaignIntro({
           {orgName}
         </h1>
 
-        {/* <p className="text-2xl text-center py-8">
-          Thank You for Your Feedback! 🙌
-        </p> */}
-
         <p className="text-lg md:text-xl px-1">{ctaText}</p>
 
-        <SignedIn>
-          <div className="bg-muted flex max-sm:text-sm max-sm:p-2 items-center border border-border/70 p-4 rounded-md">
-            Submit Response as {`'`}
-            {user.user?.fullName}
-            {`'`}
-            <SignOutButton redirectUrl={`${pathname}`}>
-              <Button size={"icon"} variant={"ghost"} className="ml-auto">
-                <ArrowLeftRight className="w-4 h-4" />
-              </Button>
-            </SignOutButton>
-          </div>
-        </SignedIn>
+        {!onFeedbackBtnClick && (
+          <SignedIn>
+            <div className="bg-muted text-muted-foreground flex text-sm p-2 items-center border border-border/70 rounded-md">
+              Submit Response as {`'`}
+              {user.user?.fullName}
+              {`'`}
+              <SignOutButton redirectUrl={`${pathname}`}>
+                <Button size={"icon"} variant={"ghost"} className="ml-auto">
+                  <ArrowLeftRight className="w-4 h-4" />
+                </Button>
+              </SignOutButton>
+            </div>
+          </SignedIn>
+        )}
 
         <SignedOut>
           <SignInButton forceRedirectUrl={`${pathname}`}>
-            <div className="bg-accent max-sm:p-2 max-sm:text-sm hover:bg-accent/60 flex group cursor-pointer items-center border border-border/70 p-4 rounded-md">
+            <div className="bg-accent text-muted-foreground max-sm:p-2 max-sm:text-sm hover:bg-accent/60 flex group cursor-pointer items-center border border-border/70 p-4 rounded-md">
               This form required you to login
               <ArrowRight className="ml-auto group-hover:translate-x-1 w-4 h-4 transition-all duration-200 -translate-x-1" />
             </div>
           </SignInButton>
         </SignedOut>
 
-        <div className="flex">
+        <p
+          className={cn("text-2xl text-center py-6", !isSubmitted && "hidden")}
+        >
+          Thank You for Your Feedback! 🙌
+        </p>
+
+        <div className={cn("flex", isSubmitted && "hidden")}>
           <div className="mx-auto">
+            {/* button for server rendering */}
+            <SubmitReviewBtn
+              className={cn((user.isLoaded || user.isSignedIn) && "hidden")}
+            />
+
             {onFeedbackBtnClick ? (
               <SubmitReviewBtn onClick={onFeedbackBtnClick} />
             ) : (
-              <Dialog
-                onOpenChange={(open) => {
-                  if (!open) triggerShapeConfetti();
-                }}
-              >
-                <DialogTrigger>
-                  <SubmitReviewBtn />
-                </DialogTrigger>
-                <DialogContent className="overflow-y-auto max-h-[90svh]">
-                  <DialogTitle className="sr-only">
-                    Submit Review Dialog
-                  </DialogTitle>
-                  <FeedbackForm ratingComponent="star" {...formProps} />
-                </DialogContent>
-              </Dialog>
+              <>
+                <SignedOut>
+                  <SignInButton forceRedirectUrl={`${pathname}`}>
+                    <SubmitReviewBtn />
+                  </SignInButton>
+                </SignedOut>
+                <SignedIn>
+                  <Dialog
+                    open={openDialog}
+                    onOpenChange={(open) => setOpenDialog(open)}
+                    // onOpenChange={(open) => {
+                    //   if (!open) triggerShapeConfetti();
+                    // }}
+                  >
+                    <DialogTrigger disabled={!user.isSignedIn}>
+                      <SubmitReviewBtn />
+                    </DialogTrigger>
+                    <DialogContent className="overflow-y-auto max-h-[90svh]">
+                      <DialogTitle className="sr-only">
+                        Submit Review Dialog
+                      </DialogTitle>
+                      <FeedbackForm
+                        ratingComponent="star"
+                        {...formProps}
+                        onSubmit={() => {
+                          setOpenDialog(false);
+                          setIsSubmitted(true);
+                        }}
+                      />
+                    </DialogContent>
+                  </Dialog>
+                </SignedIn>
+              </>
             )}
           </div>
         </div>
+        <footer className="text-center text-xs text-muted-foreground">
+          Powered by Review Plethora
+        </footer>
       </div>
     </main>
   );

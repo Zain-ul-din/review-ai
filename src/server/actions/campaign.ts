@@ -67,4 +67,6 @@ export async function updateCampaign(id: string, data: CampaignFormType) {
       updateAt: new Date().toISOString(),
     } as CampaignFormType
   );
+
+  // TODO: see revalidation
 }

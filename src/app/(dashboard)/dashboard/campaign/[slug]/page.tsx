@@ -9,9 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { TextureButton } from "@/components/ui/texture-button";
 import { ROUTES } from "@/lib/constants";
 import { getCampaignById } from "@/server/dal/campaign";
 import { getCampaignFeedback } from "@/server/dal/campaign-feedback";
+import { Edit, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 export default async function Campaign({
@@ -29,31 +31,37 @@ export default async function Campaign({
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="space-y-2">
-          <h2 className="text-xl">{campaign?.name} Campaign response</h2>
-          <p className="text-muted-foreground text-sm">
-            {campaign?.description}
-          </p>
-        </div>
-        <div className="flex gap-4 flex-wrap">
-          <Link href={`${ROUTES.campaign}/${slug}/edit`}>
-            <Button>Edit Campaign</Button>
-          </Link>
+        <div className="flex items-center flex-wrap gap-4">
+          <div className="space-y-2">
+            <h2 className="text-xl">{campaign?.name} Campaign response</h2>
+            <p className="text-muted-foreground text-sm">
+              {campaign?.description}
+            </p>
+          </div>
+          <div className="sm:ml-auto flex gap-4 flex-wrap items-center">
+            <Link href={`${ROUTES.campaign}/${slug}/edit`}>
+              <TextureButton variant="secondary">
+                <Edit className="w-4 h-4 mr-2" /> Edit
+              </TextureButton>
+            </Link>
 
-          <Link href={`${ROUTES.review}/${slug}`}>
-            <Button>Public page</Button>
-          </Link>
+            <Link href={`${ROUTES.review}/${slug}`}>
+              <Button variant={"outline"} size="icon">
+                <ExternalLink />
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        <Table>
+        <Table className="mt-8">
           <TableHeader>
             <TableRow>
-              <TableHead>Avatar</TableHead>
-              <TableHead>User Name</TableHead>
-              <TableHead>Rating</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Reviews</TableHead>
-              <TableHead>Updated At</TableHead>
+              <TableHead className="text-nowrap">Avatar</TableHead>
+              <TableHead className="text-nowrap">User Name</TableHead>
+              <TableHead className="text-nowrap">Rating</TableHead>
+              <TableHead className="text-nowrap">Title</TableHead>
+              <TableHead className="text-nowrap">Reviews</TableHead>
+              <TableHead className="text-nowrap">Updated At</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -71,7 +79,7 @@ export default async function Campaign({
                   <TableCell>{feedback.userMeta.fullName}</TableCell>
                   <TableCell>{feedback.rating}</TableCell>
                   <TableCell>{feedback.title}</TableCell>
-                  <TableCell>{feedback.review}</TableCell>
+                  <TableCell className="max-w-48">{feedback.review}</TableCell>
                   <TableCell>
                     {new Date(feedback.updatedAt).toDateString()}
                   </TableCell>

@@ -1,9 +1,11 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
-import { Home, MessageCircle, Star } from "lucide-react";
+import { Home, MessageCircle, Settings, Star } from "lucide-react";
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -13,6 +15,9 @@ import {
 } from "@/components/ui/sidebar";
 import { ROUTES } from "@/lib/constants";
 import { usePathname } from "next/navigation";
+import { SignedIn, useClerk, useUser } from "@clerk/nextjs";
+import { Avatar } from "./ui/avatar";
+import { Button } from "./ui/button";
 
 // Menu items.
 const items = [
@@ -52,6 +57,10 @@ const items = [
 export function AppSidebar() {
   const pathname = usePathname();
 
+  const user = useUser();
+
+  const { openUserProfile } = useClerk();
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -77,6 +86,29 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SignedIn>
+          <div className="flex items-center mb-4 mx-2">
+            <div className="flex items-center gap-2">
+              <Avatar className="w-8 h-8">
+                <img
+                  src={user.user?.imageUrl}
+                  alt={user.user?.fullName || ""}
+                />
+              </Avatar>
+              <p>{user.user?.fullName}</p>
+            </div>
+            <Button
+              size={"icon"}
+              className="ml-auto"
+              variant={"secondary"}
+              onClick={() => openUserProfile()}
+            >
+              <Settings />
+            </Button>
+          </div>
+        </SignedIn>
+      </SidebarFooter>
     </Sidebar>
   );
 }

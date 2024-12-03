@@ -4,11 +4,12 @@ import Link from "next/link";
 
 // Third-party library imports
 import Balancer from "react-wrap-balancer";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 
 // Local component imports
 import { Section, Container } from "@/components/craft";
 import { Button } from "../ui/button";
+import { ROUTES } from "@/lib/constants";
 
 const Hero = () => {
   return (
@@ -21,26 +22,26 @@ const Hero = () => {
             size={"sm"}
             variant={"outline"}
           >
-            <Link className="not-prose" href="https://9d8.dev">
-              Lorem ipsum dolor sit amet <ArrowRight className="w-4" />
+            <Link className="not-prose" href={ROUTES.signUp}>
+              <Star className="w-4 fill-yellow-400  text-yellow-400" /> Start
+              Collecting Reviews <ArrowRight className="w-4" />
             </Link>
           </Button>
           <h1>
-            <Balancer>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit
-            </Balancer>
+            <Balancer>Effortless Reviews, Maximum Impact.</Balancer>
           </h1>
           <h3 className="text-muted-foreground">
             <Balancer>
-              Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              Boost your credibility with real customer feedback. Reviews
+              Plethora makes it easy to collect and verify reviews with just a
+              few clicks. Manage and export your reviews hassle-free—anytime,
+              anywhere.
             </Balancer>
           </h3>
           <div className="not-prose my-8 h-96 w-full overflow-hidden rounded-lg border md:h-[480px] md:rounded-xl">
             <Image
               className="h-full w-full object-cover object-bottom"
-              src={"/placeholder.webp"}
+              src={"/hero-img.png"}
               width={1920}
               height={1080}
               alt="hero image"

@@ -18,7 +18,7 @@ export async function submitFeedback(feedback: FeedbackFormType) {
 
   const db = await getDB();
 
-  db.collection(collections.usersFeedback).insertOne({
+  await db.collection(collections.usersFeedback).insertOne({
     userId,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

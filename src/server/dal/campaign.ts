@@ -16,6 +16,8 @@ export async function getAllCampaigns() {
   return campaigns;
 }
 
+// TODO: security check
+// store owner id too send owner
 export async function getCampaignById(id: string) {
   const db = await getDB();
 

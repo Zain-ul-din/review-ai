@@ -8,7 +8,10 @@ import Balancer from "react-wrap-balancer";
 import { Button } from "../ui/button";
 
 // Icon imports
-import { Github, Twitter, Facebook } from "lucide-react";
+import {
+  Github,
+  // Twitter, Facebook
+} from "lucide-react";
 
 // Local component imports
 import { Section, Container } from "../craft";
@@ -50,15 +53,17 @@ export default function Footer() {
         </Container>
         <Container className="not-prose flex flex-col justify-between gap-6 border-t md:flex-row md:items-center md:gap-2">
           <div className="flex gap-2">
-            <Button variant="outline" size="icon">
-              <Github />
-            </Button>
-            <Button variant="outline" size="icon">
+            <Link href={"https://www.github.com/zain-ul-din"}>
+              <Button variant="outline" size="icon" aria-label="GitHub">
+                <Github />
+              </Button>
+            </Link>
+            {/* <Button variant="outline" size="icon">
               <Twitter />
             </Button>
             <Button variant="outline" size="icon">
               <Facebook />
-            </Button>
+            </Button> */}
           </div>
           <p className="text-muted-foreground">
             © Review Plethora . All rights reserved. 2024-present.

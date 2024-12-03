@@ -38,13 +38,14 @@ const Hero = () => {
               anywhere.
             </Balancer>
           </h3>
-          <div className="not-prose my-8 h-96 w-full overflow-hidden rounded-lg border md:h-[480px] md:rounded-xl">
+          <div className="not-prose my-8 h-96 w-full overflow-hidden rounded-lg  md:h-[480px] md:rounded-xl">
             <Image
               className="h-full w-full object-cover object-bottom"
-              src={"/hero-img.png"}
+              src={"/hero.png"}
               width={1920}
               height={1080}
               alt="hero image"
+              priority
             />
           </div>
         </div>

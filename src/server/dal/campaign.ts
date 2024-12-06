@@ -10,14 +10,15 @@ export async function getAllCampaigns() {
   const db = await getDB();
   const campaigns = await db
     .collection(collections.campaigns)
-    .aggregate([{ $match: { userId: { $eq: userId } } }])
+    .aggregate([
+      { $match: { userId: { $eq: userId }, isDeleted: { $ne: true } } },
+    ])
     .toArray();
 
   return campaigns;
 }
 
 // TODO: security check
-// store owner id too send owner
 export async function getCampaignById(id: string) {
   const db = await getDB();
 
@@ -25,6 +26,7 @@ export async function getCampaignById(id: string) {
     .collection<CampaignType>(collections.campaigns)
     .findOne({
       _id: new ObjectId(id),
+      isDeleted: { $ne: true },
     });
 
   return campaign;

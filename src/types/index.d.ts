@@ -7,6 +7,7 @@ export type CampaignType = CampaignFormType & {
   updateAt: string;
   userId: string;
   _id: string | ObjectId;
+  isDeleted?: boolean;
 };
 
 type UserMeta = {

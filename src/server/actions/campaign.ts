@@ -37,6 +37,27 @@ export async function createCampaign(data: CampaignFormType) {
   redirect(ROUTES.dashboard);
 }
 
+export async function deleteCampaign(id: string) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error(`No user currently logged In`);
+  }
+
+  const db = await getDB();
+
+  await db.collection(collections.campaigns).updateOne(
+    {
+      _id: new ObjectId(id),
+    },
+    {
+      $set: {
+        isDeleted: true,
+      },
+    }
+  );
+}
+
 export async function updateCampaign(id: string, data: CampaignFormType) {
   const validateFields = campaignFormSchema.safeParse(data);
 
@@ -60,12 +81,14 @@ export async function updateCampaign(id: string, data: CampaignFormType) {
       _id: new ObjectId(id),
     },
     {
-      ctaText,
-      description,
-      name,
-      ratingComponentType,
-      updateAt: new Date().toISOString(),
-    } as CampaignFormType
+      $set: {
+        ctaText,
+        description,
+        name,
+        ratingComponentType,
+        updateAt: new Date().toISOString(),
+      } as CampaignFormType,
+    }
   );
 
   // TODO: see revalidation

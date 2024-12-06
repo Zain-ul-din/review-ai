@@ -2,6 +2,7 @@ import Campaign from "@/components/campaign";
 import { clerkBackendClient } from "@/lib/clerk-sdk";
 import { getCampaignById } from "@/server/dal/campaign";
 import { CampaignType } from "@/types";
+import { Metadata } from "next";
 import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
 
@@ -19,6 +20,31 @@ const fetchData = unstable_cache(
   ["campaign"],
   { revalidate: 3600 }
 );
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const { campaign, user } = await fetchData(slug);
+
+  if (campaign.isDeleted) return {};
+
+  const title = `Review ${
+    user.fullName || `${user.firstName || ""} ${user.lastName || ""}`
+  } on Reviews Plethora`;
+  const description = campaign.ctaText;
+
+  return {
+    title,
+    description: description,
+    openGraph: {
+      title,
+      description: description,
+    },
+  };
+}
 
 export default async function ReviewPage({
   params,

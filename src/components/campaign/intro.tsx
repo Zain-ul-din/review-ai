@@ -25,6 +25,8 @@ import {
 import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
 import { useState } from "react";
+import Link from "next/link";
+import { ROUTES } from "@/lib/constants";
 
 interface CampaignProps {
   ctaText: string;
@@ -152,7 +154,15 @@ export function CampaignIntro({
           </div>
         </div>
         <footer className="text-center text-xs text-muted-foreground">
-          Powered by Review Plethora
+          Powered by{" "}
+          <Link
+            href={ROUTES.home}
+            target="_blank"
+            className="underline underline-offset-1"
+          >
+            {" "}
+            Reviews Plethora
+          </Link>
         </footer>
       </div>
     </main>

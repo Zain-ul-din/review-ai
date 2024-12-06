@@ -13,7 +13,7 @@ import {
 import { ROUTES } from "@/lib/constants";
 import Link from "next/link";
 import { TextureButton } from "../ui/texture-button";
-import { Brain, Edit, ExternalLink, Trash } from "lucide-react";
+import { Brain, Copy, Edit, ExternalLink, Trash } from "lucide-react";
 import { CampaignFeedbackType, CampaignType } from "@/types";
 import { useOrbiousAI } from "@/lib/orbious-ai";
 import Balancer from "react-wrap-balancer";
@@ -87,40 +87,42 @@ export default function CampaignDetails({
             </span>
           </div>
         </div>
-
-        <div className="p-4 border rounded-md bg-card">
-          <div className="flex items-center gap-4 flex-wrap">
-            <div className="space-y-1">
-              <h2 className="text-lg text-muted-foreground">Reviews summary</h2>
-              {response && (
-                <p className="flex-1 w-full text-[1rem]">
-                  <Balancer>{response}</Balancer>
-                </p>
-              )}
+        {feedbacks.length > 0 && (
+          <div className="p-4 border rounded-md bg-card">
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="space-y-1">
+                <h2 className="text-lg text-muted-foreground">
+                  Reviews summary
+                </h2>
+                {response && (
+                  <p className="flex-1 w-full text-[1rem]">
+                    <Balancer>{response}</Balancer>
+                  </p>
+                )}
+              </div>
+              <span className="ml-auto">
+                <TextureButton
+                  variant="secondary"
+                  onClick={() =>
+                    prompt(
+                      feedbacks
+                        .map(
+                          (feedback) =>
+                            `rating: ${feedback.rating} - review: ${feedback.review}`
+                        )
+                        .join("\n---\n")
+                    )
+                  }
+                  isLoading={loading}
+                >
+                  <Brain className="w-4 h-4 mr-2" />
+                  Ask AI
+                </TextureButton>
+              </span>
             </div>
-            <span className="ml-auto">
-              <TextureButton
-                variant="secondary"
-                onClick={() =>
-                  prompt(
-                    feedbacks
-                      .map(
-                        (feedback) =>
-                          `rating: ${feedback.rating} - review: ${feedback.review}`
-                      )
-                      .join("\n---\n")
-                  )
-                }
-                isLoading={loading}
-              >
-                <Brain className="w-4 h-4 mr-2" />
-                Ask AI
-              </TextureButton>
-            </span>
           </div>
-        </div>
-
-        <Table className="mt-6">
+        )}
+        <Table className="my-6">
           <TableHeader>
             <TableRow>
               <TableHead className="text-nowrap">Avatar</TableHead>
@@ -155,6 +157,29 @@ export default function CampaignDetails({
             })}
           </TableBody>
         </Table>
+
+        {feedbacks.length === 0 && (
+          <div className="flex flex-col justify-center border-t items-center pt-8 gap-4">
+            <p className="text-muted-foreground">
+              <Balancer>
+                No response so far, copy & share this link with your audience.
+              </Balancer>
+            </p>
+            <span className="flex">
+              <TextureButton
+                onClick={() => {
+                  navigator.share({
+                    title: "Reviews Plethora",
+                    text: `${campaign.ctaText}`,
+                    url: `${window.location.origin}${ROUTES.review}/${slug}`,
+                  });
+                }}
+              >
+                <Copy className="w-4 h-4" /> Share Link
+              </TextureButton>
+            </span>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

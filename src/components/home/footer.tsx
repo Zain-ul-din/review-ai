@@ -66,7 +66,7 @@ export default function Footer() {
             </Button> */}
           </div>
           <p className="text-muted-foreground">
-            © Review Plethora . All rights reserved. 2024-present.
+            © Reviews Plethora . All rights reserved. 2024-present.
           </p>
         </Container>
       </Section>

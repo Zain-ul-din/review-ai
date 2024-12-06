@@ -27,13 +27,14 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const { campaign, user } = await fetchData(slug);
+  const { campaign } = await fetchData(slug);
 
   if (campaign.isDeleted) return {};
 
-  const title = `Review ${
-    user.fullName || `${user.firstName || ""} ${user.lastName || ""}`
-  } on Reviews Plethora`;
+  // const title = `Review ${
+  //   user.fullName || `${user.firstName || ""} ${user.lastName || ""}`
+  // } on Reviews Plethora`;
+  const title = "Review Plethora";
   const description = campaign.ctaText;
 
   return {
@@ -42,6 +43,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description: description,
+      images: [{ url: "/social-card.png" }],
     },
   };
 }

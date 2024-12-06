@@ -1,6 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { Home, MessageCircle, Settings, Star } from "lucide-react";
+import {
+  ArrowLeft,
+  Home,
+  MessageCircle,
+  Settings,
+  Star,
+  User,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -9,15 +16,22 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { ROUTES } from "@/lib/constants";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { SignedIn, useClerk, useUser } from "@clerk/nextjs";
 import { Avatar } from "./ui/avatar";
-import { Button } from "./ui/button";
+import { Logo } from "./icons/logo";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 // Menu items.
 const items = [
@@ -59,10 +73,17 @@ export function AppSidebar() {
 
   const user = useUser();
 
-  const { openUserProfile } = useClerk();
+  const { openUserProfile, signOut } = useClerk();
+  const router = useRouter();
 
   return (
     <Sidebar>
+      <SidebarHeader>
+        <h1 className="text-lg mx-1 text-foreground font-medium flex items-center gap-2 mt-6">
+          <Logo className="w-8 h-8" />
+          Reviews Plethora
+        </h1>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="my-4">Dashboard</SidebarGroupLabel>
@@ -98,14 +119,29 @@ export function AppSidebar() {
               </Avatar>
               <p>{user.user?.fullName}</p>
             </div>
-            <Button
-              size={"icon"}
-              className="ml-auto"
-              variant={"secondary"}
-              onClick={() => openUserProfile()}
-            >
-              <Settings />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="ml-auto">
+                <Settings className="w-5 h-5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => openUserProfile()}>
+                  <User />
+                  profile
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    signOut({
+                      redirectUrl: ROUTES.home,
+                    }).then(() => {
+                      router.push(ROUTES.home);
+                    });
+                  }}
+                  className="text-red-500 focus:text-red-600"
+                >
+                  <ArrowLeft /> sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </SignedIn>
       </SidebarFooter>

@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { getAllCampaigns } from "@/server/dal/campaign";
 import Link from "next/link";
 import { ROUTES } from "@/lib/constants";
@@ -9,15 +8,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import DashboardLayout from "@/components/layout/dashboard";
+import { TextureButton } from "@/components/ui/texture-button";
 
 export default async function Dashboard() {
   const campaigns = await getAllCampaigns();
 
   if (campaigns.length === 0) {
     return (
-      <div className="p-8 h-[100svh] flex items-center justify-center">
+      <div className="p-8 h-[100svh] gap-4 flex-col flex items-center justify-center">
+        <h2 className="text-2xl">No campaign found</h2>
         <Link href={ROUTES.newCampaign}>
-          <Button>Create New Campaign</Button>
+          <TextureButton variant="secondary">Create New Campaign</TextureButton>
         </Link>
       </div>
     );

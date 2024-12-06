@@ -5,8 +5,10 @@ import Header from "@/components/home/header";
 import Hero from "@/components/home/hero";
 import HowItWorksSection from "@/components/home/how-it-work";
 import { TextureButton } from "@/components/ui/texture-button";
+import { ROUTES } from "@/lib/constants";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -28,12 +30,12 @@ export default function Home() {
               className="object-cover mx-auto max-w-full md:w-[700px]"
             />
             <div className="flex">
-              <span className="mx-auto">
+              <Link className="mx-auto" href={ROUTES.signUp}>
                 <TextureButton variant="accent">
                   Get Started for Free
                   <ArrowRight className="w-4 h-4" />
                 </TextureButton>
-              </span>
+              </Link>
             </div>
           </div>
         </Container>

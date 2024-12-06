@@ -7,4 +7,5 @@ export const ROUTES = {
   signIn: "/sign-in",
   signUp: "/sign-up",
   review: "/review",
+  home: "/",
 };

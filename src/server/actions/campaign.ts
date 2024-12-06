@@ -10,6 +10,7 @@ import { ROUTES } from "@/lib/constants";
 import { redirect } from "next/navigation";
 import { collections } from "../db/collections";
 import { ObjectId } from "mongodb";
+import { revalidateTag } from "next/cache";
 
 export async function createCampaign(data: CampaignFormType) {
   const validateFields = campaignFormSchema.safeParse(data);
@@ -56,6 +57,8 @@ export async function deleteCampaign(id: string) {
       },
     }
   );
+
+  revalidateTag("campaign");
 }
 
 export async function updateCampaign(id: string, data: CampaignFormType) {
@@ -91,5 +94,5 @@ export async function updateCampaign(id: string, data: CampaignFormType) {
     }
   );
 
-  // TODO: see revalidation
+  revalidateTag("campaign");
 }

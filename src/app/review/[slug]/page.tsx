@@ -3,6 +3,7 @@ import { clerkBackendClient } from "@/lib/clerk-sdk";
 import { getCampaignById } from "@/server/dal/campaign";
 import { CampaignType } from "@/types";
 import { unstable_cache } from "next/cache";
+import { notFound } from "next/navigation";
 
 const fetchData = unstable_cache(
   async (slug: string) => {
@@ -26,6 +27,9 @@ export default async function ReviewPage({
 }) {
   const { slug } = await params;
   const { campaign, user } = await fetchData(slug);
+
+  if (campaign.isDeleted) notFound();
+
   return (
     <Campaign campaign={JSON.parse(JSON.stringify(campaign))} owner={user} />
   );

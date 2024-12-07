@@ -2,6 +2,7 @@
 "use client";
 import {
   ArrowLeft,
+  Code,
   Home,
   MessageCircle,
   Settings,
@@ -44,6 +45,11 @@ const items = [
     title: "New Campaign",
     url: ROUTES.newCampaign,
     icon: Star,
+  },
+  {
+    title: "Developer",
+    url: ROUTES.developer,
+    icon: Code,
   },
   {
     title: "Feedback",

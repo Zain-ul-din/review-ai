@@ -3,6 +3,7 @@ export const ROUTES = {
   newCampaign: "/dashboard/new",
   campaign: "/dashboard/campaign",
   feedback: "/dashboard/feedback",
+  developer: "/dashboard/developer",
 
   signIn: "/sign-in",
   signUp: "/sign-up",

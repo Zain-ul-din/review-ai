@@ -11,7 +11,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, ArrowRight, Edit } from "lucide-react";
+import { ArrowLeft, ArrowRight, Edit, Eye } from "lucide-react";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { usePagination } from "react-use-pagination";
@@ -80,6 +80,14 @@ export default function CampaignForm({
         background: "var(--pink-indigo)",
       }}
     >
+      {currentPage > 0 && (
+        <>
+          <div className="top-0 px-4 max-sm:text-sm text-center w-full py-4 bg-background absolute flex justify-center">
+            <Eye className="mr-1" />
+            This is how the preview page appears to end users.
+          </div>
+        </>
+      )}
       {(() => {
         switch (currentPage) {
           case 0:
@@ -139,74 +147,80 @@ export default function CampaignForm({
         >
           <ArrowLeft />
         </Button>
-        <span>|</span>
-        <Popover open={true}>
-          <PopoverTrigger>
-            <Button size={"icon"} onClick={() => setIsPopOverOpen(true)}>
-              <Edit />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            className={cn(
-              "mb-4 md:mb-6 w-[20rem] max-w-full space-y-4",
-              !isPopOverOpen && "hidden"
-            )}
-          >
-            <Form {...form}>
-              <form>
-                <FormField
-                  name="ctaText"
-                  control={form.control}
-                  render={({ field }) => {
-                    return (
-                      <Textarea
-                        placeholder="type your text here"
-                        className={cn(
-                          "max-h-[300px] min-h-[80px]",
-                          currentPage != 1 && "hidden"
-                        )}
-                        {...field}
-                      />
-                    );
-                  }}
-                />
-
-                <FormField
-                  name="ratingComponentType"
-                  control={form.control}
-                  render={({ field }) => {
-                    return (
-                      <FormItem className={cn(currentPage != 2 && "hidden")}>
-                        <FormLabel>Rating Component</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select Rating Component" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="star">Rating</SelectItem>
-                            <SelectItem value="emoji">Emoji</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    );
-                  }}
-                />
-              </form>
-            </Form>
-
-            <div className="w-full flex">
-              <Button
-                className="ml-auto"
-                onClick={() => setIsPopOverOpen(false)}
+        {currentPage > 0 && (
+          <>
+            <span>|</span>
+            <Popover open={true}>
+              <PopoverTrigger>
+                <Button size={"icon"} onClick={() => setIsPopOverOpen(true)}>
+                  <Edit />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className={cn(
+                  "mb-4 md:mb-6 w-[20rem] max-w-full space-y-4",
+                  !isPopOverOpen && "hidden"
+                )}
               >
-                Close
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
+                <Form {...form}>
+                  <form>
+                    <FormField
+                      name="ctaText"
+                      control={form.control}
+                      render={({ field }) => {
+                        return (
+                          <Textarea
+                            placeholder="type your text here"
+                            className={cn(
+                              "max-h-[300px] min-h-[80px]",
+                              currentPage != 1 && "hidden"
+                            )}
+                            {...field}
+                          />
+                        );
+                      }}
+                    />
+
+                    <FormField
+                      name="ratingComponentType"
+                      control={form.control}
+                      render={({ field }) => {
+                        return (
+                          <FormItem
+                            className={cn(currentPage != 2 && "hidden")}
+                          >
+                            <FormLabel>Rating Component</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select Rating Component" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="star">Rating</SelectItem>
+                                <SelectItem value="emoji">Emoji</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        );
+                      }}
+                    />
+                  </form>
+                </Form>
+
+                <div className="w-full flex">
+                  <Button
+                    className="ml-auto"
+                    onClick={() => setIsPopOverOpen(false)}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </>
+        )}
         <span>|</span>
         <Button
           type="button"
@@ -223,30 +237,32 @@ export default function CampaignForm({
         >
           <ArrowRight />
         </Button>
-        <>
-          <span>|</span>
-          <Button
-            className="text-xl"
-            onClick={() => {
-              form.handleSubmit((data) => {
-                if (defaultValues) {
-                  // submit edit request
-                  startTransition(async () => {
-                    await updateCampaign(defaultValues._id as string, data);
-                  });
-                } else {
-                  startTransition(async () => {
-                    await createCampaign(data);
-                  });
-                }
-              })();
-            }}
-            disabled={nextEnabled || loading}
-            isLoading={loading}
-          >
-            Submit
-          </Button>
-        </>
+        {!nextEnabled && (
+          <>
+            <span>|</span>
+            <Button
+              className="text-xl"
+              onClick={() => {
+                form.handleSubmit((data) => {
+                  if (defaultValues) {
+                    // submit edit request
+                    startTransition(async () => {
+                      await updateCampaign(defaultValues._id as string, data);
+                    });
+                  } else {
+                    startTransition(async () => {
+                      await createCampaign(data);
+                    });
+                  }
+                })();
+              }}
+              disabled={nextEnabled || loading}
+              isLoading={loading}
+            >
+              Submit
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );

@@ -115,7 +115,7 @@ export function CampaignIntro({
             />
 
             {onFeedbackBtnClick ? (
-              <SubmitReviewBtn onClick={onFeedbackBtnClick} />
+              <></>
             ) : (
               <>
                 <SignedOut>

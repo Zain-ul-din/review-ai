@@ -9,9 +9,9 @@ import { Section, Container } from "@/components/craft";
 const HowItWorksSection = () => {
   return (
     <>
-      <Section className="md:pb-0 pb-0">
-        <h2 className="text-center">How it Works?</h2>
-        <Container className="grid items-stretch md:grid-cols-2 md:gap-12">
+      <Section className="md:pb-0 pb-0 mb-12 sm:mb-14">
+        <h2 className="text-center text-xl my-56 pb-12">How it Works?</h2>
+        <Container className="grid items-stretch md:grid-cols-2 md:gap-12 border border-sky-400/30 bg-sky-300/30 rounded-lg">
           <div className="flex flex-col gap-6 py-8 sm:my-auto">
             <h2 className="!my-0">Launch a New Campaign</h2>
             <p className="font-light leading-[1.4] opacity-70">
@@ -42,7 +42,7 @@ const HowItWorksSection = () => {
       {/* get reviews */}
 
       <Section className="md:pt-0 pt-0">
-        <Container className="grid items-stretch md:grid-cols-2 md:gap-12">
+        <Container className="grid items-stretch md:grid-cols-2 md:gap-12 border border-green-400/30 bg-green-300/30 rounded-lg">
           <div className="not-prose relative flex h-96 overflow-hidden rounded-lg">
             <Image
               src={"/get-reviews-light.svg"}

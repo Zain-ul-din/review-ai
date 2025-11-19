@@ -34,10 +34,25 @@ function isOriginAllowed(origin: string | null, whitelistedDomains?: string[]): 
   });
 }
 
+// Helper function to get CORS headers
+function getCorsHeaders(origin: string | null) {
+  // If origin is null or "null", use "*"
+  const allowOrigin = (origin && origin !== "null") ? origin : "*";
+
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ campaignId: string }> }
 ) {
+  const origin = request.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+
   try {
     const { campaignId } = await params;
 
@@ -47,18 +62,17 @@ export async function GET(
     if (!campaign) {
       return NextResponse.json(
         { error: "Campaign not found" },
-        { status: 404 }
+        { status: 404, headers: corsHeaders }
       );
     }
 
     // Check CORS origin
-    const origin = request.headers.get("origin");
     const whitelistedDomains = campaign.whitelistedDomains;
 
     if (!isOriginAllowed(origin, whitelistedDomains)) {
       return NextResponse.json(
         { error: "Domain not whitelisted. Please add your domain to the campaign's whitelist." },
-        { status: 403 }
+        { status: 403, headers: corsHeaders }
       );
     }
 
@@ -95,9 +109,7 @@ export async function GET(
 
     return NextResponse.json(widgetData, {
       headers: {
-        "Access-Control-Allow-Origin": origin || "*",
-        "Access-Control-Allow-Methods": "GET",
-        "Access-Control-Allow-Headers": "Content-Type",
+        ...corsHeaders,
         "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
       },
     });
@@ -105,22 +117,14 @@ export async function GET(
     console.error("Widget API error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
 
 export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
 
-  return NextResponse.json(
-    {},
-    {
-      headers: {
-        "Access-Control-Allow-Origin": origin || "*",
-        "Access-Control-Allow-Methods": "GET, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
-      },
-    }
-  );
+  return NextResponse.json({}, { headers: corsHeaders });
 }

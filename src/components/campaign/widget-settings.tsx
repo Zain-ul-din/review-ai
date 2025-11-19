@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Plus, X, Globe } from "lucide-react";
+import { Plus, X, Globe, Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { updateCampaignWidgetSettings } from "@/server/actions/campaign";
@@ -17,6 +17,20 @@ export function WidgetSettings({ campaignId, initialDomains }: WidgetSettingsPro
   const [domains, setDomains] = useState<string[]>(initialDomains || []);
   const [newDomain, setNewDomain] = useState("");
   const [saving, setSaving] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const widgetCode = `<!-- Add this script tag to your <head> or before </body> -->
+<script src="${typeof window !== 'undefined' ? window.location.origin : ''}/widget.js" async></script>
+
+<!-- Add this div where you want the reviews to appear -->
+<div data-reviews-plethora-campaign="${campaignId}"></div>`;
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(widgetCode);
+    setCopied(true);
+    toast.success("Widget code copied to clipboard!");
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleAddDomain = () => {
     const trimmedDomain = newDomain.trim();
@@ -62,6 +76,55 @@ export function WidgetSettings({ campaignId, initialDomains }: WidgetSettingsPro
 
   return (
     <div className="space-y-6">
+      {/* Widget Code Section */}
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold">Widget Installation Code</h3>
+          <p className="text-sm text-muted-foreground">
+            Copy and paste this code into your website to display your reviews.
+          </p>
+        </div>
+
+        <div className="relative">
+          <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm border">
+            <code>{widgetCode}</code>
+          </pre>
+          <Button
+            onClick={handleCopyCode}
+            variant="outline"
+            size="sm"
+            className="absolute top-2 right-2"
+          >
+            {copied ? (
+              <>
+                <Check className="w-4 h-4 mr-2" />
+                Copied!
+              </>
+            ) : (
+              <>
+                <Copy className="w-4 h-4 mr-2" />
+                Copy Code
+              </>
+            )}
+          </Button>
+        </div>
+
+        <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+          <h4 className="text-sm font-semibold mb-2 text-blue-900 dark:text-blue-100">
+            📋 Quick Setup
+          </h4>
+          <ol className="text-sm text-blue-800 dark:text-blue-200 space-y-1 list-decimal list-inside">
+            <li>Copy the code above</li>
+            <li>Paste it into your HTML file</li>
+            <li>The widget will automatically display your reviews!</li>
+          </ol>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="border-t" />
+
+      {/* Domain Whitelist Section */}
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Widget Domain Whitelist</h3>
         <p className="text-sm text-muted-foreground">

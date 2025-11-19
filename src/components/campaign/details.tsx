@@ -20,6 +20,7 @@ import { WidgetSettings } from "./widget-settings";
 import { ReviewModeration } from "./review-moderation";
 import { RatingBreakdown } from "./rating-breakdown";
 import { WebhookSettings } from "./webhook-settings";
+import { MagicLinksManager } from "./magic-links-manager";
 
 export default function CampaignDetails({
   campaign,
@@ -163,9 +164,10 @@ export default function CampaignDetails({
         </div>
 
         <Tabs defaultValue="reviews" className="w-full">
-          <TabsList className="grid w-full max-w-3xl grid-cols-4">
+          <TabsList className="grid w-full max-w-4xl grid-cols-5">
             <TabsTrigger value="reviews">Reviews</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="magic-links">Magic Links</TabsTrigger>
             <TabsTrigger value="widget">Widget</TabsTrigger>
             <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
           </TabsList>
@@ -254,6 +256,10 @@ export default function CampaignDetails({
               initialDomains={campaign.whitelistedDomains || []}
               initialCustomization={campaign.widgetCustomization}
             />
+          </TabsContent>
+
+          <TabsContent value="magic-links" className="space-y-6">
+            <MagicLinksManager campaignId={slug} />
           </TabsContent>
 
           <TabsContent value="webhooks" className="space-y-6">

@@ -57,4 +57,36 @@ export type CampaignFeedbackType = CampaignFeedbackFormType & {
   flagReason?: string;
   isAnonymous?: boolean;
   ipHash?: string;
+  isMagicLink?: boolean;
+  magicLinkToken?: string;
+  magicLinkMetadata?: {
+    orderId?: string;
+    generatedAt: string;
+    usedAt?: string;
+    sentVia?: "manual" | "email" | "sms";
+  };
+};
+
+export type MagicLinkStatus = "pending" | "used" | "expired";
+
+export type MagicLink = {
+  _id: string;
+  campaignId: string;
+  tokenHash: string;
+  customerName: string;
+  customerEmail: string;
+  orderId?: string;
+  status: MagicLinkStatus;
+  createdAt: string;
+  expiresAt: string;
+  usedAt?: string;
+  reviewId?: string;
+};
+
+export type MagicLinkPayload = {
+  campaignId: string;
+  customerName: string;
+  customerEmail: string;
+  orderId?: string;
+  exp: number;
 };

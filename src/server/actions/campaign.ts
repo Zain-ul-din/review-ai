@@ -206,3 +206,46 @@ export async function updateCampaignWidgetSettings(
 
   return { success: true };
 }
+
+export async function updateWidgetCustomization(
+  campaignId: string,
+  customization: {
+    primaryColor?: string;
+    backgroundColor?: string;
+    textColor?: string;
+    headerText?: string;
+    layout?: "list" | "grid" | "carousel";
+    showAvatars?: boolean;
+    showDates?: boolean;
+    showTitles?: boolean;
+    brandingText?: string;
+  }
+) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+
+  // Verify campaign ownership
+  const campaign = await getCampaignById(campaignId);
+
+  if (!campaign) {
+    throw new Error("Campaign not found or unauthorized");
+  }
+
+  const db = await getDB();
+  await db.collection(collections.campaigns).updateOne(
+    { _id: new ObjectId(campaignId) },
+    {
+      $set: {
+        widgetCustomization: customization,
+        updateAt: new Date().toISOString(),
+      },
+    }
+  );
+
+  revalidateTag("campaign");
+
+  return { success: true };
+}

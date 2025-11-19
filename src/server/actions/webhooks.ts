@@ -169,7 +169,7 @@ export async function triggerWebhook(webhook: Webhook, payload: unknown) {
     headers: {
       "Content-Type": "application/json",
       "X-Webhook-Signature": signature,
-      "X-Webhook-Event": payload.event,
+      "X-Webhook-Event": (payload as { event: string }).event,
     },
     body: JSON.stringify(payload),
   });

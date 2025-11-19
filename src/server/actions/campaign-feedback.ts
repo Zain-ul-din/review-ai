@@ -139,7 +139,7 @@ export async function updateReviewStatus(
 
   // Trigger webhooks for status changes
   if (review && status === "approved") {
-    const reviewDoc = review as { rating: number; title: string; review: string };
+    const reviewDoc = review as unknown as { rating: number; title: string; review: string };
     await triggerCampaignWebhooks(campaignId, "review.approved", {
       review: {
         id: reviewId,
@@ -150,7 +150,7 @@ export async function updateReviewStatus(
       },
     }).catch(console.error);
   } else if (review && status === "rejected") {
-    const reviewDoc = review as { rating: number; title: string; review: string };
+    const reviewDoc = review as unknown as { rating: number; title: string; review: string };
     await triggerCampaignWebhooks(campaignId, "review.rejected", {
       review: {
         id: reviewId,
@@ -210,7 +210,7 @@ export async function flagReview(
 
   // Trigger webhook for flagged review
   if (review && flagged) {
-    const reviewDoc = review as { rating: number; title: string; review: string };
+    const reviewDoc = review as unknown as { rating: number; title: string; review: string };
     await triggerCampaignWebhooks(campaignId, "review.flagged", {
       review: {
         id: reviewId,

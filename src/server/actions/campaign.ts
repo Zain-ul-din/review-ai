@@ -164,3 +164,45 @@ export async function exportCampaignReviewsCSV(campaignId: string) {
     filename: `${campaign.name.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_reviews_${new Date().toISOString().split("T")[0]}.csv`,
   };
 }
+
+export async function updateCampaignWidgetSettings(
+  campaignId: string,
+  whitelistedDomains: string[]
+) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+
+  // Verify campaign ownership
+  const campaign = await getCampaignById(campaignId);
+
+  if (!campaign) {
+    throw new Error("Campaign not found or unauthorized");
+  }
+
+  // Validate domains
+  for (const domain of whitelistedDomains) {
+    try {
+      new URL(domain);
+    } catch {
+      throw new Error(`Invalid URL: ${domain}`);
+    }
+  }
+
+  const db = await getDB();
+  await db.collection(collections.campaigns).updateOne(
+    { _id: new ObjectId(campaignId) },
+    {
+      $set: {
+        whitelistedDomains,
+        updateAt: new Date().toISOString(),
+      },
+    }
+  );
+
+  revalidateTag("campaign");
+
+  return { success: true };
+}

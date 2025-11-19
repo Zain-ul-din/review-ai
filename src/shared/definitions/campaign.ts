@@ -13,12 +13,19 @@ export const composedCampaignSchema = {
   feedbackForm: z.object({
     ratingComponentType: z.enum(["star", "emoji"]).default("star"),
   }),
+  widgetSettings: z.object({
+    whitelistedDomains: z
+      .array(z.string().url({ message: "Must be a valid URL" }))
+      .default([])
+      .optional(),
+  }),
 };
 
 export const campaignFormSchema = z.object({
   ...composedCampaignSchema.metadata.shape,
   ...composedCampaignSchema.homePage.shape,
   ...composedCampaignSchema.feedbackForm.shape,
+  ...composedCampaignSchema.widgetSettings.shape,
 });
 
 export type CampaignFormType = z.infer<typeof campaignFormSchema>;

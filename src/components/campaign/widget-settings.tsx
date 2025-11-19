@@ -16,18 +16,7 @@ import { Plus, X, Globe, Copy, Check, Palette } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { updateCampaignWidgetSettings, updateWidgetCustomization } from "@/server/actions/campaign";
-
-interface WidgetCustomization {
-  primaryColor?: string;
-  backgroundColor?: string;
-  textColor?: string;
-  headerText?: string;
-  layout?: "list" | "grid" | "carousel";
-  showAvatars?: boolean;
-  showDates?: boolean;
-  showTitles?: boolean;
-  brandingText?: string;
-}
+import { WidgetCustomization } from "@/types/index.d";
 
 interface WidgetSettingsProps {
   campaignId: string;

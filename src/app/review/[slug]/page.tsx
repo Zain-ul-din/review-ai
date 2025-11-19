@@ -1,6 +1,6 @@
 import Campaign from "@/components/campaign";
 import { clerkBackendClient } from "@/lib/clerk-sdk";
-import { getCampaignById } from "@/server/dal/campaign";
+import { getPublicCampaignById } from "@/server/dal/campaign";
 import { CampaignType } from "@/types";
 import { Metadata } from "next";
 import { unstable_cache } from "next/cache";
@@ -9,7 +9,12 @@ import { notFound } from "next/navigation";
 const fetchData = unstable_cache(
   async (slug: string) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const campaign = (await getCampaignById(slug)) as CampaignType;
+    const campaign = (await getPublicCampaignById(slug)) as CampaignType;
+
+    if (!campaign) {
+      return null;
+    }
+
     const user = await clerkBackendClient.users.getUser(campaign.userId);
 
     return {
@@ -27,9 +32,11 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const { campaign } = await fetchData(slug);
+  const data = await fetchData(slug);
 
-  if (campaign.isDeleted) return {};
+  if (!data || data.campaign.isDeleted) return {};
+
+  const { campaign } = data;
 
   // const title = `Review ${
   //   user.fullName || `${user.firstName || ""} ${user.lastName || ""}`
@@ -54,9 +61,13 @@ export default async function ReviewPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const { campaign, user } = await fetchData(slug);
+  const data = await fetchData(slug);
 
-  if (campaign.isDeleted) notFound();
+  if (!data || data.campaign.isDeleted) {
+    notFound();
+  }
+
+  const { campaign, user } = data;
 
   return (
     <Campaign campaign={JSON.parse(JSON.stringify(campaign))} owner={user} />

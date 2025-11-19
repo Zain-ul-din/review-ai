@@ -26,6 +26,7 @@ import { deleteCampaignFeedback } from "@/server/actions/campaign-feedback";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import CampaignAnalytics from "./analytics";
+import { WidgetSettings } from "./widget-settings";
 
 export default function CampaignDetails({
   campaign,
@@ -186,9 +187,10 @@ export default function CampaignDetails({
         </div>
 
         <Tabs defaultValue="reviews" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-2xl grid-cols-3">
             <TabsTrigger value="reviews">Reviews</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="widget">Widget Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="reviews" className="space-y-6">
@@ -316,6 +318,13 @@ export default function CampaignDetails({
                 </p>
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="widget" className="space-y-6">
+            <WidgetSettings
+              campaignId={slug}
+              initialDomains={campaign.whitelistedDomains || []}
+            />
           </TabsContent>
         </Tabs>
       </div>

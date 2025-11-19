@@ -1,5 +1,5 @@
 import { getPublicCampaignById } from "@/server/dal/campaign";
-import { getCampaignFeedback } from "@/server/dal/campaign-feedback";
+import { getApprovedCampaignFeedback } from "@/server/dal/campaign-feedback";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const feedbacks = await getCampaignFeedback(slug);
+  const feedbacks = await getApprovedCampaignFeedback(slug);
   const averageRating = feedbacks.length
     ? feedbacks.reduce((acc, f) => acc + f.rating, 0) / feedbacks.length
     : 0;
@@ -51,7 +51,7 @@ export default async function PublicCampaignPage({ params }: Props) {
     notFound();
   }
 
-  const feedbacks = await getCampaignFeedback(slug);
+  const feedbacks = await getApprovedCampaignFeedback(slug);
   const averageRating = feedbacks.length
     ? feedbacks.reduce((acc, f) => acc + f.rating, 0) / feedbacks.length
     : 0;

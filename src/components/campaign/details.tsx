@@ -1,15 +1,6 @@
 "use client";
 import DashboardLayout from "@/components/layout/dashboard";
-import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ROUTES } from "@/lib/constants";
 import Link from "next/link";
@@ -22,11 +13,11 @@ import { reviewsSummarySystemInstruction } from "@/lib/orbious-ai/system";
 import AreYouSure from "../shared/are-you-sure";
 import { useRef, useState, useTransition } from "react";
 import { deleteCampaign, exportCampaignReviewsCSV } from "@/server/actions/campaign";
-import { deleteCampaignFeedback } from "@/server/actions/campaign-feedback";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import CampaignAnalytics from "./analytics";
 import { WidgetSettings } from "./widget-settings";
+import { ReviewModeration } from "./review-moderation";
 
 export default function CampaignDetails({
   campaign,
@@ -43,29 +34,12 @@ export default function CampaignDetails({
 
   const [deleting, startDeleteTransition] = useTransition();
   const [exporting, setExporting] = useState(false);
-  const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null);
   const deleteBtnRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
 
   const handleCopyCampaignId = () => {
     navigator.clipboard.writeText(slug);
     toast.success("Campaign ID copied to clipboard!");
-  };
-
-  const handleDeleteReview = async (reviewId: string) => {
-    if (!confirm("Are you sure you want to delete this review?")) {
-      return;
-    }
-
-    setDeletingReviewId(reviewId);
-    try {
-      await deleteCampaignFeedback(reviewId, slug);
-      toast.success("Review deleted successfully");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to delete review");
-    } finally {
-      setDeletingReviewId(null);
-    }
   };
 
   const handleExportCSV = async () => {
@@ -230,59 +204,9 @@ export default function CampaignDetails({
               </div>
             )}
 
-            <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-nowrap">Avatar</TableHead>
-              <TableHead className="text-nowrap">User Name</TableHead>
-              <TableHead className="text-nowrap">Rating</TableHead>
-              <TableHead className="text-nowrap">Title</TableHead>
-              <TableHead className="text-nowrap">Reviews</TableHead>
-              <TableHead className="text-nowrap">Updated At</TableHead>
-              <TableHead className="text-nowrap">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {feedbacks.map((feedback, i) => {
-              return (
-                <TableRow key={i}>
-                  <TableCell>
-                    <Avatar className="w-8 h-8">
-                      <img
-                        src={feedback.userMeta.imageUrl}
-                        alt={feedback.userMeta.fullName}
-                      />
-                    </Avatar>
-                  </TableCell>
-                  <TableCell>{feedback.userMeta.fullName}</TableCell>
-                  <TableCell>{feedback.rating}</TableCell>
-                  <TableCell>{feedback.title}</TableCell>
-                  <TableCell className="max-w-48">{feedback.review}</TableCell>
-                  <TableCell>
-                    {new Date(feedback.updatedAt).toDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDeleteReview(feedback._id)}
-                      disabled={deletingReviewId === feedback._id}
-                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                    >
-                      {deletingReviewId === feedback._id ? (
-                        <span className="animate-spin">⏳</span>
-                      ) : (
-                        <Trash className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-
-            {feedbacks.length === 0 && (
+            {feedbacks.length > 0 ? (
+              <ReviewModeration feedbacks={feedbacks} campaignId={slug} />
+            ) : (
               <div className="flex flex-col justify-center border-t items-center pt-8 gap-4">
                 <p className="text-muted-foreground">
                   <Balancer>

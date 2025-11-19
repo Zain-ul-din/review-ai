@@ -35,6 +35,8 @@ export async function submitCampaignFeedback(data: CampaignFeedbackFormType) {
         ...data,
         userId: user.id,
         campaignId: data.id,
+        status: "approved", // Auto-approve new reviews by default
+        flagged: false,
         userMeta: {
           firstName: user.firstName,
           lastName: user.lastName,
@@ -75,6 +77,81 @@ export async function deleteCampaignFeedback(reviewId: string, campaignId: strin
     _id: reviewId as any,
     campaignId: campaignId,
   });
+
+  // Revalidate the campaign details page
+  revalidateTag("campaign-feedback");
+  revalidatePath(`/dashboard/campaign/${campaignId}`);
+
+  return { success: true };
+}
+
+export async function updateReviewStatus(
+  reviewId: string,
+  campaignId: string,
+  status: "pending" | "approved" | "rejected"
+) {
+  // Verify campaign ownership
+  const campaign = await getCampaignById(campaignId);
+
+  if (!campaign) {
+    throw new Error("Campaign not found or unauthorized");
+  }
+
+  const db = await getDB();
+
+  // Update review status
+  await db.collection(collections.campaignFeedbacks).updateOne(
+    {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      _id: reviewId as any,
+      campaignId: campaignId,
+    },
+    {
+      $set: {
+        status,
+        updatedAt: new Date().toISOString(),
+      },
+    }
+  );
+
+  // Revalidate the campaign details page
+  revalidateTag("campaign-feedback");
+  revalidatePath(`/dashboard/campaign/${campaignId}`);
+  revalidatePath(`/p/${campaignId}`); // Also revalidate public page
+
+  return { success: true };
+}
+
+export async function flagReview(
+  reviewId: string,
+  campaignId: string,
+  flagged: boolean,
+  reason?: string
+) {
+  // Verify campaign ownership
+  const campaign = await getCampaignById(campaignId);
+
+  if (!campaign) {
+    throw new Error("Campaign not found or unauthorized");
+  }
+
+  const db = await getDB();
+
+  // Flag/unflag the review
+  await db.collection(collections.campaignFeedbacks).updateOne(
+    {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      _id: reviewId as any,
+      campaignId: campaignId,
+    },
+    {
+      $set: {
+        flagged,
+        flagReason: flagged ? reason : undefined,
+        updatedAt: new Date().toISOString(),
+      },
+    }
+  );
 
   // Revalidate the campaign details page
   revalidateTag("campaign-feedback");

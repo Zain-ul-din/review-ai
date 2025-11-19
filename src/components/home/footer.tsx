@@ -22,7 +22,7 @@ import { ROUTES } from "@/lib/constants";
 
 export default function Footer() {
   return (
-    <footer>
+    <footer className="not-prose">
       <Section>
         <Container className="grid gap-12 md:grid-cols-[1.5fr_0.5fr_0.5fr]">
           <div className="not-prose flex flex-col gap-2">

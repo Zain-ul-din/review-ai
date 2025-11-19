@@ -52,7 +52,7 @@ const faqs = [
 
 export default function FAQ() {
   return (
-    <Section className="relative">
+    <Section className="not-prose relative">
       {/* Background decoration */}
       <div className="absolute inset-0 bg-gradient-to-b from-muted/20 via-background to-background -z-10" />
 

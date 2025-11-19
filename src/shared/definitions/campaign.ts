@@ -13,6 +13,14 @@ export const composedCampaignSchema = {
   feedbackForm: z.object({
     ratingComponentType: z.enum(["star", "emoji"]).default("star"),
   }),
+  authentication: z.object({
+    methods: z
+      .array(z.enum(["anonymous", "google", "facebook", "github"]))
+      .default(["anonymous", "google"])
+      .refine((methods) => methods.length > 0, {
+        message: "At least one authentication method must be selected",
+      }),
+  }),
   widgetSettings: z.object({
     whitelistedDomains: z
       .array(z.string().url({ message: "Must be a valid URL" }))
@@ -35,6 +43,7 @@ export const campaignFormSchema = z.object({
   ...composedCampaignSchema.metadata.shape,
   ...composedCampaignSchema.homePage.shape,
   ...composedCampaignSchema.feedbackForm.shape,
+  ...composedCampaignSchema.authentication.shape,
   ...composedCampaignSchema.widgetSettings.shape,
   ...composedCampaignSchema.widgetCustomization.shape,
 });

@@ -13,7 +13,7 @@ import { ROUTES } from "@/lib/constants";
 
 const Hero = () => {
   return (
-    <Section className="relative overflow-hidden">
+    <Section className="not-prose relative overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-muted/50 via-background to-background" />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />

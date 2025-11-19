@@ -52,27 +52,49 @@ const faqs = [
 
 export default function FAQ() {
   return (
-    <Section>
-      <Container className="flex flex-col gap-6">
-        <div className="flex justify-center items-center gap-4">
-          <Image
-            src={`/qa.svg`}
-            alt="Question Answer logo"
-            width={60}
-            height={60}
-          />
-          <h2 className="!m-0 !p-0">{`FAQ's`}</h2>
+    <Section className="relative">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-gradient-to-b from-muted/20 via-background to-background -z-10" />
+
+      <Container className="flex flex-col gap-12">
+        {/* Section Header */}
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="flex items-center justify-center gap-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary/10 blur-xl rounded-full" />
+              <Image
+                src={`/qa.svg`}
+                alt="Question Answer logo"
+                width={60}
+                height={60}
+                className="relative"
+              />
+            </div>
+            <h2 className="!m-0 !p-0 text-3xl md:text-4xl font-bold">{`FAQ's`}</h2>
+          </div>
+          <p className="text-muted-foreground text-lg max-w-2xl">
+            Everything you need to know about Reviews Plethora
+          </p>
         </div>
 
-        <div className="max-w-[650px] mx-auto w-full not-prose">
-          <Accordion type="single" collapsible className="w-full">
+        {/* FAQ Accordion */}
+        <div className="max-w-3xl mx-auto w-full not-prose">
+          <Accordion
+            type="single"
+            collapsible
+            className="w-full space-y-4"
+          >
             {faqs.map((faq, i) => {
               return (
-                <AccordionItem value={`item-${i + 1}`} key={i}>
-                  <AccordionTrigger className="text-xl">
+                <AccordionItem
+                  value={`item-${i + 1}`}
+                  key={i}
+                  className="border rounded-lg px-6 bg-card hover:bg-accent/5 transition-colors"
+                >
+                  <AccordionTrigger className="text-lg md:text-xl font-medium hover:no-underline py-5">
                     {faq.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-lg">
+                  <AccordionContent className="text-base md:text-lg text-muted-foreground pb-5">
                     {faq.answer}
                   </AccordionContent>
                 </AccordionItem>

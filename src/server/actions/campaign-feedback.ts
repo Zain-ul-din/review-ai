@@ -8,6 +8,7 @@ import { revalidateTag, revalidatePath } from "next/cache";
 import { getDB } from "../db";
 import { collections } from "../db/collections";
 import { getCampaignById } from "../dal/campaign";
+import { triggerCampaignWebhooks } from "./webhooks";
 
 export async function submitCampaignFeedback(data: CampaignFeedbackFormType) {
   const validatedFields = campaignFeedbackSchema.safeParse(data);
@@ -56,6 +57,21 @@ export async function submitCampaignFeedback(data: CampaignFeedbackFormType) {
     }
   );
 
+  // Trigger webhook for review.created event
+  await triggerCampaignWebhooks(data.id, "review.created", {
+    review: {
+      id: _id,
+      rating: data.rating,
+      title: data.title,
+      review: data.review,
+      author: {
+        name: user.fullName || "Anonymous",
+        email: user.emailAddresses[0]?.emailAddress,
+      },
+      createdAt: new Date().toISOString(),
+    },
+  }).catch(console.error); // Don't block on webhook failures
+
   // Revalidate the campaign details page and feedback data
   revalidateTag("campaign-feedback");
   revalidatePath(`/dashboard/campaign/${data.id}`);
@@ -99,6 +115,13 @@ export async function updateReviewStatus(
 
   const db = await getDB();
 
+  // Get the review before updating for webhook payload
+  const review = await db.collection(collections.campaignFeedbacks).findOne({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    _id: reviewId as any,
+    campaignId: campaignId,
+  });
+
   // Update review status
   await db.collection(collections.campaignFeedbacks).updateOne(
     {
@@ -113,6 +136,31 @@ export async function updateReviewStatus(
       },
     }
   );
+
+  // Trigger webhooks for status changes
+  if (review && status === "approved") {
+    const reviewDoc = review as { rating: number; title: string; review: string };
+    await triggerCampaignWebhooks(campaignId, "review.approved", {
+      review: {
+        id: reviewId,
+        rating: reviewDoc.rating,
+        title: reviewDoc.title,
+        review: reviewDoc.review,
+        status: "approved",
+      },
+    }).catch(console.error);
+  } else if (review && status === "rejected") {
+    const reviewDoc = review as { rating: number; title: string; review: string };
+    await triggerCampaignWebhooks(campaignId, "review.rejected", {
+      review: {
+        id: reviewId,
+        rating: reviewDoc.rating,
+        title: reviewDoc.title,
+        review: reviewDoc.review,
+        status: "rejected",
+      },
+    }).catch(console.error);
+  }
 
   // Revalidate the campaign details page
   revalidateTag("campaign-feedback");
@@ -137,6 +185,13 @@ export async function flagReview(
 
   const db = await getDB();
 
+  // Get the review before updating for webhook payload
+  const review = await db.collection(collections.campaignFeedbacks).findOne({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    _id: reviewId as any,
+    campaignId: campaignId,
+  });
+
   // Flag/unflag the review
   await db.collection(collections.campaignFeedbacks).updateOne(
     {
@@ -152,6 +207,21 @@ export async function flagReview(
       },
     }
   );
+
+  // Trigger webhook for flagged review
+  if (review && flagged) {
+    const reviewDoc = review as { rating: number; title: string; review: string };
+    await triggerCampaignWebhooks(campaignId, "review.flagged", {
+      review: {
+        id: reviewId,
+        rating: reviewDoc.rating,
+        title: reviewDoc.title,
+        review: reviewDoc.review,
+        flagged: true,
+        flagReason: reason,
+      },
+    }).catch(console.error);
+  }
 
   // Revalidate the campaign details page
   revalidateTag("campaign-feedback");

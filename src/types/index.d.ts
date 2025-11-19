@@ -13,6 +13,17 @@ export type WidgetCustomization = {
   showTitles?: boolean;
 };
 
+export type WebhookEvent = "review.created" | "review.approved" | "review.rejected" | "review.flagged";
+
+export type Webhook = {
+  _id: string;
+  url: string;
+  events: WebhookEvent[];
+  secret?: string;
+  enabled: boolean;
+  createdAt: string;
+};
+
 export type CampaignType = CampaignFormType & {
   createdAt: string;
   updateAt: string;
@@ -20,6 +31,7 @@ export type CampaignType = CampaignFormType & {
   _id: string | ObjectId;
   isDeleted?: boolean;
   widgetCustomization?: WidgetCustomization;
+  webhooks?: Webhook[];
 };
 
 type UserMeta = {

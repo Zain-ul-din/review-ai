@@ -37,3 +37,16 @@ export async function getCampaignById(id: string) {
 
   return campaign;
 }
+
+export async function getPublicCampaignById(id: string) {
+  const db = await getDB();
+
+  const campaign = await db
+    .collection<CampaignType>(collections.campaigns)
+    .findOne({
+      _id: new ObjectId(id),
+      isDeleted: { $ne: true },
+    });
+
+  return campaign;
+}

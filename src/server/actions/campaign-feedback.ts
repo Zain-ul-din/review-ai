@@ -7,6 +7,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { revalidateTag, revalidatePath } from "next/cache";
 import { getDB } from "../db";
 import { collections } from "../db/collections";
+import { getCampaignById } from "../dal/campaign";
 
 export async function submitCampaignFeedback(data: CampaignFeedbackFormType) {
   const validatedFields = campaignFeedbackSchema.safeParse(data);
@@ -56,4 +57,28 @@ export async function submitCampaignFeedback(data: CampaignFeedbackFormType) {
   // Revalidate the campaign details page and feedback data
   revalidateTag("campaign-feedback");
   revalidatePath(`/dashboard/campaign/${data.id}`);
+}
+
+export async function deleteCampaignFeedback(reviewId: string, campaignId: string) {
+  // Verify campaign ownership
+  const campaign = await getCampaignById(campaignId);
+
+  if (!campaign) {
+    throw new Error("Campaign not found or unauthorized");
+  }
+
+  const db = await getDB();
+
+  // Delete the review
+  await db.collection(collections.campaignFeedbacks).deleteOne({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    _id: reviewId as any,
+    campaignId: campaignId,
+  });
+
+  // Revalidate the campaign details page
+  revalidateTag("campaign-feedback");
+  revalidatePath(`/dashboard/campaign/${campaignId}`);
+
+  return { success: true };
 }

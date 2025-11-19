@@ -11,7 +11,6 @@ export type WidgetCustomization = {
   showAvatars?: boolean;
   showDates?: boolean;
   showTitles?: boolean;
-  brandingText?: string;
 };
 
 export type CampaignType = CampaignFormType & {

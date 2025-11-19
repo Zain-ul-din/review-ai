@@ -103,7 +103,6 @@ export async function GET(
         showAvatars: true,
         showDates: true,
         showTitles: true,
-        brandingText: "Powered by Reviews Plethora",
       },
       reviews: feedbacks.map((feedback) => ({
         id: feedback._id,

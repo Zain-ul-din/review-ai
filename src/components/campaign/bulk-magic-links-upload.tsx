@@ -5,7 +5,6 @@ import Papa from "papaparse";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -55,7 +54,6 @@ interface BulkMagicLinksUploadProps {
 }
 
 export function BulkMagicLinksUpload({ campaignId, onComplete }: BulkMagicLinksUploadProps) {
-  const [file, setFile] = useState<File | null>(null);
   const [parsedData, setParsedData] = useState<ParsedData[]>([]);
   const [results, setResults] = useState<BulkUploadResult[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -134,8 +132,6 @@ Bob Johnson,bob@example.com,`;
       toast.error("Please upload a CSV file");
       return;
     }
-
-    setFile(selectedFile);
 
     Papa.parse<CSVRow>(selectedFile, {
       header: true,
@@ -232,7 +228,6 @@ Bob Johnson,bob@example.com,`;
 
   // Reset
   const handleReset = () => {
-    setFile(null);
     setParsedData([]);
     setResults([]);
     setStep("upload");

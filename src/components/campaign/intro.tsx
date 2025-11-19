@@ -154,7 +154,7 @@ export function CampaignIntro({
                           variant="outline"
                         >
                           <FcGoogle className="mr-2 h-5 w-5" />
-                          Continue with Google
+                          Submit with Google
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="overflow-y-auto max-h-[90svh]">

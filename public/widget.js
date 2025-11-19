@@ -10,6 +10,9 @@
       max-width: 800px;
       margin: 0 auto;
       padding: 20px;
+      --widget-primary-color: #000000;
+      --widget-bg-color: #ffffff;
+      --widget-text-color: #333333;
     }
 
     .reviews-plethora-header {
@@ -23,7 +26,7 @@
       font-size: 24px;
       font-weight: 700;
       margin: 0 0 10px 0;
-      color: #111827;
+      color: var(--widget-primary-color);
     }
 
     .reviews-plethora-stats {
@@ -37,7 +40,7 @@
     .reviews-plethora-rating {
       font-size: 32px;
       font-weight: 700;
-      color: #111827;
+      color: var(--widget-primary-color);
     }
 
     .reviews-plethora-stars {
@@ -70,12 +73,30 @@
       gap: 20px;
     }
 
+    .reviews-plethora-list.layout-grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+
+    .reviews-plethora-list.layout-carousel {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 20px;
+      padding-bottom: 10px;
+    }
+
+    .reviews-plethora-list.layout-carousel .reviews-plethora-review {
+      flex: 0 0 300px;
+      scroll-snap-align: start;
+    }
+
     .reviews-plethora-review {
-      background: #ffffff;
+      background: var(--widget-bg-color);
       border: 1px solid #e5e7eb;
       border-radius: 8px;
       padding: 20px;
       transition: box-shadow 0.2s;
+      color: var(--widget-text-color);
     }
 
     .reviews-plethora-review:hover {
@@ -102,7 +123,7 @@
 
     .reviews-plethora-author-name {
       font-weight: 600;
-      color: #111827;
+      color: var(--widget-text-color);
       margin: 0 0 4px 0;
       font-size: 14px;
     }
@@ -122,13 +143,13 @@
       font-size: 16px;
       font-weight: 600;
       margin: 0 0 8px 0;
-      color: #111827;
+      color: var(--widget-text-color);
     }
 
     .reviews-plethora-review-text {
       font-size: 14px;
       line-height: 1.6;
-      color: #374151;
+      color: var(--widget-text-color);
       margin: 0;
       white-space: pre-wrap;
     }
@@ -216,13 +237,21 @@
       }
 
       const data = await response.json();
+      const customization = data.customization || {};
+
+      // Apply customization CSS variables
+      const widgetStyle = `
+        --widget-primary-color: ${customization.primaryColor || '#000000'};
+        --widget-bg-color: ${customization.backgroundColor || '#ffffff'};
+        --widget-text-color: ${customization.textColor || '#333333'};
+      `;
 
       // Render widget
-      let html = '<div class="reviews-plethora-widget">';
+      let html = `<div class="reviews-plethora-widget" style="${widgetStyle}">`;
 
       // Header
       html += `<div class="reviews-plethora-header">
-        <h2 class="reviews-plethora-title">${escapeHtml(data.campaign.name)}</h2>
+        <h2 class="reviews-plethora-title">${escapeHtml(customization.headerText || data.campaign.name)}</h2>
         <div class="reviews-plethora-stats">
           <span class="reviews-plethora-rating">${data.stats.averageRating}</span>
           <div>
@@ -234,21 +263,41 @@
 
       // Reviews list
       if (data.reviews.length > 0) {
-        html += '<div class="reviews-plethora-list">';
+        const layout = customization.layout || 'list';
+        html += `<div class="reviews-plethora-list layout-${layout}">`;
 
         data.reviews.forEach(review => {
-          html += `<div class="reviews-plethora-review">
-            <div class="reviews-plethora-review-header">
-              <img src="${escapeHtml(review.author.avatar)}" alt="${escapeHtml(review.author.name)}" class="reviews-plethora-avatar" />
-              <div class="reviews-plethora-author-info">
-                <p class="reviews-plethora-author-name">${escapeHtml(review.author.name)}</p>
-                <p class="reviews-plethora-review-date">${formatDate(review.createdAt)}</p>
-              </div>
-            </div>
-            <div class="reviews-plethora-review-stars">${renderStars(review.rating)}</div>
-            <h3 class="reviews-plethora-review-title">${escapeHtml(review.title)}</h3>
-            <p class="reviews-plethora-review-text">${escapeHtml(review.review)}</p>
-          </div>`;
+          html += `<div class="reviews-plethora-review">`;
+
+          // Avatar and author info (conditionally shown)
+          if (customization.showAvatars !== false || customization.showDates !== false) {
+            html += `<div class="reviews-plethora-review-header">`;
+
+            if (customization.showAvatars !== false) {
+              html += `<img src="${escapeHtml(review.author.avatar)}" alt="${escapeHtml(review.author.name)}" class="reviews-plethora-avatar" />`;
+            }
+
+            html += `<div class="reviews-plethora-author-info">
+              <p class="reviews-plethora-author-name">${escapeHtml(review.author.name)}</p>`;
+
+            if (customization.showDates !== false) {
+              html += `<p class="reviews-plethora-review-date">${formatDate(review.createdAt)}</p>`;
+            }
+
+            html += `</div></div>`;
+          }
+
+          // Stars
+          html += `<div class="reviews-plethora-review-stars">${renderStars(review.rating)}</div>`;
+
+          // Title (conditionally shown)
+          if (customization.showTitles !== false) {
+            html += `<h3 class="reviews-plethora-review-title">${escapeHtml(review.title)}</h3>`;
+          }
+
+          // Review text
+          html += `<p class="reviews-plethora-review-text">${escapeHtml(review.review)}</p>`;
+          html += `</div>`;
         });
 
         html += '</div>';
@@ -256,9 +305,10 @@
         html += '<div class="reviews-plethora-loading">No reviews yet</div>';
       }
 
-      // Footer
+      // Footer with custom branding
+      const brandingText = customization.brandingText || 'Powered by <a href="https://reviews-plethora.com" target="_blank" rel="noopener">Reviews Plethora</a>';
       html += `<div class="reviews-plethora-footer">
-        <p class="reviews-plethora-powered">Powered by <a href="https://reviews-plethora.com" target="_blank" rel="noopener">Reviews Plethora</a></p>
+        <p class="reviews-plethora-powered">${brandingText}</p>
       </div>`;
 
       html += '</div>';

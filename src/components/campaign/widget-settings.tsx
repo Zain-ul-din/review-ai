@@ -3,21 +3,57 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Plus, X, Globe, Copy, Check } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus, X, Globe, Copy, Check, Palette } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { updateCampaignWidgetSettings } from "@/server/actions/campaign";
+import { updateCampaignWidgetSettings, updateWidgetCustomization } from "@/server/actions/campaign";
+
+interface WidgetCustomization {
+  primaryColor?: string;
+  backgroundColor?: string;
+  textColor?: string;
+  headerText?: string;
+  layout?: "list" | "grid" | "carousel";
+  showAvatars?: boolean;
+  showDates?: boolean;
+  showTitles?: boolean;
+  brandingText?: string;
+}
 
 interface WidgetSettingsProps {
   campaignId: string;
   initialDomains: string[];
+  initialCustomization?: WidgetCustomization;
 }
 
-export function WidgetSettings({ campaignId, initialDomains }: WidgetSettingsProps) {
+export function WidgetSettings({ campaignId, initialDomains, initialCustomization }: WidgetSettingsProps) {
   const [domains, setDomains] = useState<string[]>(initialDomains || []);
   const [newDomain, setNewDomain] = useState("");
   const [saving, setSaving] = useState(false);
+  const [savingCustomization, setSavingCustomization] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Widget customization state
+  const [customization, setCustomization] = useState<WidgetCustomization>({
+    primaryColor: initialCustomization?.primaryColor || "#000000",
+    backgroundColor: initialCustomization?.backgroundColor || "#ffffff",
+    textColor: initialCustomization?.textColor || "#333333",
+    headerText: initialCustomization?.headerText || "Customer Reviews",
+    layout: initialCustomization?.layout || "list",
+    showAvatars: initialCustomization?.showAvatars ?? true,
+    showDates: initialCustomization?.showDates ?? true,
+    showTitles: initialCustomization?.showTitles ?? true,
+    brandingText: initialCustomization?.brandingText || "Powered by Reviews Plethora",
+  });
 
   const widgetCode = `<!-- Add this script tag to your <head> or before </body> -->
 <script src="${typeof window !== 'undefined' ? window.location.origin : ''}/widget.js" async></script>
@@ -74,6 +110,18 @@ export function WidgetSettings({ campaignId, initialDomains }: WidgetSettingsPro
     }
   };
 
+  const handleSaveCustomization = async () => {
+    setSavingCustomization(true);
+    try {
+      await updateWidgetCustomization(campaignId, customization);
+      toast.success("Widget customization saved successfully!");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to save customization");
+    } finally {
+      setSavingCustomization(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Widget Code Section */}
@@ -118,6 +166,187 @@ export function WidgetSettings({ campaignId, initialDomains }: WidgetSettingsPro
             <li>Paste it into your HTML file</li>
             <li>The widget will automatically display your reviews!</li>
           </ol>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="border-t" />
+
+      {/* Widget Customization Section */}
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Palette className="w-5 h-5" />
+            <h3 className="text-lg font-semibold">Widget Customization</h3>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Customize the appearance and behavior of your review widget.
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Color Settings */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-semibold">Colors</h4>
+
+            <div className="space-y-2">
+              <Label htmlFor="primaryColor">Primary Color</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="primaryColor"
+                  type="color"
+                  value={customization.primaryColor}
+                  onChange={(e) => setCustomization({ ...customization, primaryColor: e.target.value })}
+                  className="w-20 h-10 cursor-pointer"
+                />
+                <Input
+                  type="text"
+                  value={customization.primaryColor}
+                  onChange={(e) => setCustomization({ ...customization, primaryColor: e.target.value })}
+                  placeholder="#000000"
+                  className="flex-1"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="backgroundColor">Background Color</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="backgroundColor"
+                  type="color"
+                  value={customization.backgroundColor}
+                  onChange={(e) => setCustomization({ ...customization, backgroundColor: e.target.value })}
+                  className="w-20 h-10 cursor-pointer"
+                />
+                <Input
+                  type="text"
+                  value={customization.backgroundColor}
+                  onChange={(e) => setCustomization({ ...customization, backgroundColor: e.target.value })}
+                  placeholder="#ffffff"
+                  className="flex-1"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="textColor">Text Color</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="textColor"
+                  type="color"
+                  value={customization.textColor}
+                  onChange={(e) => setCustomization({ ...customization, textColor: e.target.value })}
+                  className="w-20 h-10 cursor-pointer"
+                />
+                <Input
+                  type="text"
+                  value={customization.textColor}
+                  onChange={(e) => setCustomization({ ...customization, textColor: e.target.value })}
+                  placeholder="#333333"
+                  className="flex-1"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Content Settings */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-semibold">Content</h4>
+
+            <div className="space-y-2">
+              <Label htmlFor="headerText">Header Text</Label>
+              <Input
+                id="headerText"
+                type="text"
+                value={customization.headerText}
+                onChange={(e) => setCustomization({ ...customization, headerText: e.target.value })}
+                placeholder="Customer Reviews"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="layout">Layout Style</Label>
+              <Select
+                value={customization.layout}
+                onValueChange={(value: "list" | "grid" | "carousel") =>
+                  setCustomization({ ...customization, layout: value })
+                }
+              >
+                <SelectTrigger id="layout">
+                  <SelectValue placeholder="Select layout" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="list">List</SelectItem>
+                  <SelectItem value="grid">Grid</SelectItem>
+                  <SelectItem value="carousel">Carousel</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="brandingText">Branding Text</Label>
+              <Input
+                id="brandingText"
+                type="text"
+                value={customization.brandingText}
+                onChange={(e) => setCustomization({ ...customization, brandingText: e.target.value })}
+                placeholder="Powered by Reviews Plethora"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Display Options */}
+        <div className="space-y-4 pt-4 border-t">
+          <h4 className="text-sm font-semibold">Display Options</h4>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="flex items-center justify-between space-x-2">
+              <Label htmlFor="showAvatars" className="cursor-pointer">
+                Show Avatars
+              </Label>
+              <Switch
+                id="showAvatars"
+                checked={customization.showAvatars}
+                onCheckedChange={(checked) =>
+                  setCustomization({ ...customization, showAvatars: checked })
+                }
+              />
+            </div>
+
+            <div className="flex items-center justify-between space-x-2">
+              <Label htmlFor="showDates" className="cursor-pointer">
+                Show Dates
+              </Label>
+              <Switch
+                id="showDates"
+                checked={customization.showDates}
+                onCheckedChange={(checked) =>
+                  setCustomization({ ...customization, showDates: checked })
+                }
+              />
+            </div>
+
+            <div className="flex items-center justify-between space-x-2">
+              <Label htmlFor="showTitles" className="cursor-pointer">
+                Show Titles
+              </Label>
+              <Switch
+                id="showTitles"
+                checked={customization.showTitles}
+                onCheckedChange={(checked) =>
+                  setCustomization({ ...customization, showTitles: checked })
+                }
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Save Button */}
+        <div className="flex justify-end pt-4 border-t">
+          <Button onClick={handleSaveCustomization} disabled={savingCustomization}>
+            {savingCustomization ? "Saving..." : "Save Customization"}
+          </Button>
         </div>
       </div>
 

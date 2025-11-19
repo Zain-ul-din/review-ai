@@ -201,7 +201,7 @@
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
-  async function loadWidget(element, campaignId) {
+  async function loadWidget(element, campaignId, apiBaseUrl) {
     try {
       // Show loading state
       element.innerHTML = `<div class="reviews-plethora-widget">
@@ -209,7 +209,7 @@
       </div>`;
 
       // Fetch reviews
-      const response = await fetch(`${window.location.origin}/api/widget/${campaignId}`);
+      const response = await fetch(`${apiBaseUrl}/api/widget/${campaignId}`);
 
       if (!response.ok) {
         throw new Error('Failed to load reviews');
@@ -287,13 +287,36 @@
       document.head.appendChild(styleEl);
     }
 
+    // Detect API base URL from script tag
+    let apiBaseUrl = '';
+    const scripts = document.getElementsByTagName('script');
+    for (let i = 0; i < scripts.length; i++) {
+      const src = scripts[i].src;
+      if (src && src.includes('/widget.js')) {
+        try {
+          const url = new URL(src);
+          apiBaseUrl = url.origin;
+          break;
+        } catch (e) {
+          // Invalid URL, continue
+        }
+      }
+    }
+
+    // Fallback to data attribute or current origin
+    if (!apiBaseUrl) {
+      const firstContainer = document.querySelector('[data-reviews-plethora-campaign]');
+      apiBaseUrl = firstContainer?.getAttribute('data-api-url') || window.location.origin;
+    }
+
     // Find all widget containers
     const containers = document.querySelectorAll('[data-reviews-plethora-campaign]');
 
     containers.forEach(container => {
       const campaignId = container.getAttribute('data-reviews-plethora-campaign');
+      const customApiUrl = container.getAttribute('data-api-url');
       if (campaignId) {
-        loadWidget(container, campaignId);
+        loadWidget(container, campaignId, customApiUrl || apiBaseUrl);
       }
     });
   }

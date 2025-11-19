@@ -109,6 +109,22 @@ fetch('${typeof window !== 'undefined' ? window.location.origin : ''}/api/widget
                     Just add multiple divs with different campaign IDs!
                   </p>
                 </div>
+
+                <div className="space-y-2">
+                  <h3 className="font-semibold">Local Testing (Optional)</h3>
+                  <p className="text-sm text-muted-foreground">
+                    If you&apos;re testing locally with a file:// URL, you can specify the API URL manually:
+                  </p>
+                  <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
+                    <code>{`<div
+  data-reviews-plethora-campaign="YOUR_CAMPAIGN_ID"
+  data-api-url="https://your-domain.com"
+></div>`}</code>
+                  </pre>
+                  <p className="text-xs text-muted-foreground">
+                    The widget automatically detects the API URL from the script source, but you can override it with the <code className="bg-muted px-1 py-0.5 rounded">data-api-url</code> attribute.
+                  </p>
+                </div>
               </CardContent>
             </Card>
 

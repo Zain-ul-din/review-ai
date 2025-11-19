@@ -14,7 +14,10 @@ function extractDomain(url: string): string {
 
 // Helper function to check if origin is allowed
 function isOriginAllowed(origin: string | null, whitelistedDomains?: string[]): boolean {
-  if (!origin) return false;
+  // Allow null origin (local file testing) if no whitelist is set
+  if (!origin || origin === 'null') {
+    return !whitelistedDomains || whitelistedDomains.length === 0;
+  }
 
   // If no whitelist is set, allow all origins (backward compatibility)
   if (!whitelistedDomains || whitelistedDomains.length === 0) {

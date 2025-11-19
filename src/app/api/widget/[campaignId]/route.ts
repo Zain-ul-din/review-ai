@@ -94,6 +94,17 @@ export async function GET(
         totalReviews: feedbacks.length,
         averageRating: parseFloat(averageRating.toFixed(1)),
       },
+      customization: campaign.widgetCustomization || {
+        primaryColor: "#000000",
+        backgroundColor: "#ffffff",
+        textColor: "#333333",
+        headerText: "Customer Reviews",
+        layout: "list",
+        showAvatars: true,
+        showDates: true,
+        showTitles: true,
+        brandingText: "Powered by Reviews Plethora",
+      },
       reviews: feedbacks.map((feedback) => ({
         id: feedback._id,
         rating: feedback.rating,

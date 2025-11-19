@@ -248,6 +248,7 @@ export default function CampaignDetails({
             <WidgetSettings
               campaignId={slug}
               initialDomains={campaign.whitelistedDomains || []}
+              initialCustomization={campaign.widgetCustomization}
             />
           </TabsContent>
         </Tabs>

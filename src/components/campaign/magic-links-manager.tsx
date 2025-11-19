@@ -34,18 +34,25 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Copy, Trash, Link as LinkIcon, TrendingUp, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { Copy, Trash, Link as LinkIcon, TrendingUp, Clock, CheckCircle2, XCircle, Upload } from "lucide-react";
 import {
   generateMagicLink,
   getCampaignMagicLinks,
   deleteMagicLink,
   getMagicLinkStats,
 } from "@/server/actions/magic-links";
+import { BulkMagicLinksUpload } from "./bulk-magic-links-upload";
 import type { MagicLink } from "@/types";
 
 const generateLinkSchema = z.object({
@@ -237,110 +244,129 @@ export function MagicLinksManager({ campaignId }: MagicLinksManagerProps) {
         </div>
       )}
 
-      {/* Generate Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <LinkIcon className="h-5 w-5" />
-            Generate Magic Link
-          </CardTitle>
-          <CardDescription>
-            Create a personalized review link for a customer
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="customerName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Customer Name *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="John Doe" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+      {/* Generate Magic Links - Tabs for Single/Bulk */}
+      <Tabs defaultValue="single" className="w-full">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="single" className="flex items-center gap-2">
+            <LinkIcon className="h-4 w-4" />
+            Single Link
+          </TabsTrigger>
+          <TabsTrigger value="bulk" className="flex items-center gap-2">
+            <Upload className="h-4 w-4" />
+            Bulk Upload
+          </TabsTrigger>
+        </TabsList>
 
-                <FormField
-                  control={form.control}
-                  name="customerEmail"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Customer Email *</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="john@example.com"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+        <TabsContent value="single" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <LinkIcon className="h-5 w-5" />
+                Generate Magic Link
+              </CardTitle>
+              <CardDescription>
+                Create a personalized review link for a customer
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="customerName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Customer Name *</FormLabel>
+                          <FormControl>
+                            <Input placeholder="John Doe" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <FormField
-                  control={form.control}
-                  name="orderId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Order ID (Optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="#12345" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        Reference to track which order this review is for
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                    <FormField
+                      control={form.control}
+                      name="customerEmail"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Customer Email *</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="john@example.com"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <FormField
-                  control={form.control}
-                  name="expiresInDays"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Expires In</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select expiry" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="3">3 days</SelectItem>
-                          <SelectItem value="7">7 days</SelectItem>
-                          <SelectItem value="14">14 days</SelectItem>
-                          <SelectItem value="30">30 days</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                    <FormField
+                      control={form.control}
+                      name="orderId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Order ID (Optional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="#12345" {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            Reference to track which order this review is for
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isGenerating}
-                isLoading={isGenerating}
-              >
-                Generate & Copy Link
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                    <FormField
+                      control={form.control}
+                      name="expiresInDays"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Expires In</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select expiry" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="3">3 days</SelectItem>
+                              <SelectItem value="7">7 days</SelectItem>
+                              <SelectItem value="14">14 days</SelectItem>
+                              <SelectItem value="30">30 days</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isGenerating}
+                    isLoading={isGenerating}
+                  >
+                    Generate & Copy Link
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="bulk" className="mt-6">
+          <BulkMagicLinksUpload campaignId={campaignId} onComplete={loadData} />
+        </TabsContent>
+      </Tabs>
 
       {/* Links Table */}
       <Card>

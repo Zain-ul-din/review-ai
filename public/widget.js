@@ -305,10 +305,9 @@
         html += '<div class="reviews-plethora-loading">No reviews yet</div>';
       }
 
-      // Footer with custom branding
-      const brandingText = customization.brandingText || 'Powered by <a href="https://reviews-plethora.com" target="_blank" rel="noopener">Reviews Plethora</a>';
+      // Footer with branding (non-customizable)
       html += `<div class="reviews-plethora-footer">
-        <p class="reviews-plethora-powered">${brandingText}</p>
+        <p class="reviews-plethora-powered">Powered by <a href="https://reviews-plethora.com" target="_blank" rel="noopener">Reviews Plethora</a></p>
       </div>`;
 
       html += '</div>';

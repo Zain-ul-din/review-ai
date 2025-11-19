@@ -41,7 +41,6 @@ export function WidgetSettings({ campaignId, initialDomains, initialCustomizatio
     showAvatars: initialCustomization?.showAvatars ?? true,
     showDates: initialCustomization?.showDates ?? true,
     showTitles: initialCustomization?.showTitles ?? true,
-    brandingText: initialCustomization?.brandingText || "Powered by Reviews Plethora",
   });
 
   const widgetCode = `<!-- Add this script tag to your <head> or before </body> -->
@@ -272,17 +271,6 @@ export function WidgetSettings({ campaignId, initialDomains, initialCustomizatio
                 </SelectContent>
               </Select>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="brandingText">Branding Text</Label>
-              <Input
-                id="brandingText"
-                type="text"
-                value={customization.brandingText}
-                onChange={(e) => setCustomization({ ...customization, brandingText: e.target.value })}
-                placeholder="Powered by Reviews Plethora"
-              />
-            </div>
           </div>
         </div>
 
@@ -327,6 +315,106 @@ export function WidgetSettings({ campaignId, initialDomains, initialCustomizatio
                   setCustomization({ ...customization, showTitles: checked })
                 }
               />
+            </div>
+          </div>
+        </div>
+
+        {/* Live Preview */}
+        <div className="space-y-4 pt-4 border-t">
+          <h4 className="text-sm font-semibold">Live Preview</h4>
+          <p className="text-sm text-muted-foreground">
+            See how your widget will look with the current customization.
+          </p>
+
+          <div className="border rounded-lg p-6 bg-muted/30">
+            <div
+              className="max-w-2xl mx-auto p-6 rounded-lg"
+              style={{
+                backgroundColor: customization.backgroundColor,
+                color: customization.textColor,
+              }}
+            >
+              {/* Preview Header */}
+              <div className="text-center mb-6 pb-4 border-b" style={{ borderColor: customization.textColor + '20' }}>
+                <h3
+                  className="text-2xl font-bold mb-2"
+                  style={{ color: customization.primaryColor }}
+                >
+                  {customization.headerText || "Customer Reviews"}
+                </h3>
+                <div className="flex items-center justify-center gap-3">
+                  <span className="text-3xl font-bold" style={{ color: customization.primaryColor }}>4.8</span>
+                  <div>
+                    <div className="flex gap-1 mb-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <svg key={star} className="w-5 h-5" fill="#fbbf24" viewBox="0 0 24 24">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                      ))}
+                    </div>
+                    <p className="text-sm opacity-70">24 reviews</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Preview Reviews */}
+              <div className={`grid gap-4 ${customization.layout === 'grid' ? 'md:grid-cols-2' : ''} ${customization.layout === 'carousel' ? 'flex overflow-x-auto gap-4' : ''}`}>
+                {[1, 2].map((review) => (
+                  <div
+                    key={review}
+                    className="border rounded-lg p-4"
+                    style={{
+                      borderColor: customization.textColor + '20',
+                      minWidth: customization.layout === 'carousel' ? '300px' : 'auto'
+                    }}
+                  >
+                    {/* Avatar and Date */}
+                    {(customization.showAvatars || customization.showDates) && (
+                      <div className="flex gap-3 mb-3">
+                        {customization.showAvatars && (
+                          <div className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0" />
+                        )}
+                        <div className="flex-1">
+                          <p className="font-semibold text-sm" style={{ color: customization.textColor }}>
+                            John Doe
+                          </p>
+                          {customization.showDates && (
+                            <p className="text-xs opacity-70">2 days ago</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Stars */}
+                    <div className="flex gap-1 mb-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <svg key={star} className="w-4 h-4" fill="#fbbf24" viewBox="0 0 24 24">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                      ))}
+                    </div>
+
+                    {/* Title */}
+                    {customization.showTitles && (
+                      <h4 className="font-semibold mb-2" style={{ color: customization.textColor }}>
+                        Excellent Product!
+                      </h4>
+                    )}
+
+                    {/* Review Text */}
+                    <p className="text-sm leading-relaxed" style={{ color: customization.textColor }}>
+                      This is a sample review text. The actual widget will display real customer reviews.
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Branding Footer */}
+              <div className="mt-6 pt-4 border-t text-center" style={{ borderColor: customization.textColor + '20' }}>
+                <p className="text-xs opacity-70">
+                  Powered by <a href="#" className="font-medium hover:underline" style={{ color: customization.primaryColor }}>Reviews Plethora</a>
+                </p>
+              </div>
             </div>
           </div>
         </div>

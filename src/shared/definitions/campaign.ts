@@ -28,7 +28,6 @@ export const composedCampaignSchema = {
     showAvatars: z.boolean().default(true).optional(),
     showDates: z.boolean().default(true).optional(),
     showTitles: z.boolean().default(true).optional(),
-    brandingText: z.string().default("Powered by Reviews Plethora").optional(),
   }),
 };
 

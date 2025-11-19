@@ -13,7 +13,7 @@ import { ObjectId } from "mongodb";
 import { revalidateTag } from "next/cache";
 import { getCampaignById } from "../dal/campaign";
 import { getCampaignFeedback } from "../dal/campaign-feedback";
-import { CampaignFeedbackType } from "@/types";
+import { CampaignFeedbackType, WidgetCustomization } from "@/types";
 
 export async function createCampaign(data: CampaignFormType) {
   const validateFields = campaignFormSchema.safeParse(data);
@@ -209,17 +209,7 @@ export async function updateCampaignWidgetSettings(
 
 export async function updateWidgetCustomization(
   campaignId: string,
-  customization: {
-    primaryColor?: string;
-    backgroundColor?: string;
-    textColor?: string;
-    headerText?: string;
-    layout?: "list" | "grid" | "carousel";
-    showAvatars?: boolean;
-    showDates?: boolean;
-    showTitles?: boolean;
-    brandingText?: string;
-  }
+  customization: WidgetCustomization
 ) {
   const { userId } = await auth();
 

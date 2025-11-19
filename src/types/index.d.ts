@@ -2,12 +2,25 @@ import { CampaignFormType } from "@/shared/definitions/campaign";
 import { CampaignFeedbackFormType } from "@/shared/definitions/campaign-feedback";
 import { ObjectId } from "mongodb";
 
+export type WidgetCustomization = {
+  primaryColor?: string;
+  backgroundColor?: string;
+  textColor?: string;
+  headerText?: string;
+  layout?: "list" | "grid" | "carousel";
+  showAvatars?: boolean;
+  showDates?: boolean;
+  showTitles?: boolean;
+  brandingText?: string;
+};
+
 export type CampaignType = CampaignFormType & {
   createdAt: string;
   updateAt: string;
   userId: string;
   _id: string | ObjectId;
   isDeleted?: boolean;
+  widgetCustomization?: WidgetCustomization;
 };
 
 type UserMeta = {

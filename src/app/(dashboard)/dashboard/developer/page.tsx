@@ -138,9 +138,9 @@ fetch('${typeof window !== 'undefined' ? window.location.origin : ''}/api/widget
                   <h3 className="font-semibold">How to Whitelist Domains</h3>
                   <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
                     <li>Go to your campaign details page</li>
-                    <li>Click on the "Widget Settings" tab</li>
+                    <li>Click on the &quot;Widget Settings&quot; tab</li>
                     <li>Add the full URLs of domains where you want to embed the widget (e.g., https://example.com)</li>
-                    <li>Click "Save Settings"</li>
+                    <li>Click &quot;Save Settings&quot;</li>
                     <li>The widget will only work on whitelisted domains</li>
                   </ol>
                 </div>

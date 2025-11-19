@@ -66,7 +66,7 @@ export function AnonymousFeedbackForm({
         } else {
           onSuccess?.();
         }
-      } catch (err) {
+      } catch {
         setError("Failed to submit review. Please try again.");
         captchaRef.current?.resetCaptcha();
         form.setValue("captchaToken", "");

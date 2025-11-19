@@ -19,6 +19,7 @@ export default function Campaign({ campaign, owner }: CampaignProps) {
         ratingComponent: campaign.ratingComponentType,
         id: campaign._id as string,
       }}
+      authMethods={campaign.methods || ["google"]}
     />
   );
 }

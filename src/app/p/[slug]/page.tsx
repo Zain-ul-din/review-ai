@@ -7,6 +7,7 @@ import { Star } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -215,10 +216,11 @@ export default async function PublicCampaignPage({ params }: Props) {
                       </Avatar>
 
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <span className="font-semibold">
                             {feedback.userMeta.fullName}
                           </span>
+                          <VerifiedBadge isAnonymous={feedback.isAnonymous} size="sm" />
                           <span className="text-sm text-muted-foreground">
                             {new Date(feedback.createdAt).toLocaleDateString()}
                           </span>

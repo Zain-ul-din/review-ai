@@ -81,7 +81,7 @@ export async function updateCampaign(id: string, data: CampaignFormType) {
 
   const db = await getDB();
 
-  const { ctaText, description, name, ratingComponentType } = data;
+  const { ctaText, description, name, ratingComponentType, methods } = data;
   await db.collection(collections.campaigns).updateOne(
     {
       _id: new ObjectId(id),
@@ -92,6 +92,7 @@ export async function updateCampaign(id: string, data: CampaignFormType) {
         description,
         name,
         ratingComponentType,
+        methods,
         updateAt: new Date().toISOString(),
       } as CampaignFormType,
     }

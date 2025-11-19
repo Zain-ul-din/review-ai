@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { CampaignFeedbackType } from "@/types";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 import {
   Select,
   SelectContent,
@@ -221,8 +222,11 @@ export function ReviewModeration({ feedbacks, campaignId }: ReviewModerationProp
                       />
                     </Avatar>
                   </TableCell>
-                  <TableCell className="font-medium">
-                    {feedback.userMeta.fullName}
+                  <TableCell>
+                    <div className="flex flex-col gap-1">
+                      <span className="font-medium">{feedback.userMeta.fullName}</span>
+                      <VerifiedBadge isAnonymous={feedback.isAnonymous} size="sm" />
+                    </div>
                   </TableCell>
                   <TableCell>
                     <span className="font-semibold">{feedback.rating}</span>/5

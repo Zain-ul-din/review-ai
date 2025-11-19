@@ -55,4 +55,6 @@ export type CampaignFeedbackType = CampaignFeedbackFormType & {
   status?: "pending" | "approved" | "rejected";
   flagged?: boolean;
   flagReason?: string;
+  isAnonymous?: boolean;
+  ipHash?: string;
 };

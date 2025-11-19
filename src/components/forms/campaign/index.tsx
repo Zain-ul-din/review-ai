@@ -2,7 +2,15 @@
 import { CampaignIntro } from "@/components/campaign/intro";
 import { FeedbackForm } from "@/components/campaign/feedback-form";
 import { Button } from "@/components/ui/button";
-import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+} from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Popover,
   PopoverContent,
@@ -59,6 +67,7 @@ export default function CampaignForm({
       name: "",
       description: "",
       ratingComponentType: "star",
+      methods: ["anonymous", "google"],
     },
   });
 
@@ -202,6 +211,70 @@ export default function CampaignForm({
                                 <SelectItem value="emoji">Emoji</SelectItem>
                               </SelectContent>
                             </Select>
+                          </FormItem>
+                        );
+                      }}
+                    />
+
+                    <FormField
+                      name="methods"
+                      control={form.control}
+                      render={() => {
+                        const authMethods = [
+                          { id: "anonymous", label: "Anonymous (No sign-in required)" },
+                          { id: "google", label: "Google" },
+                          { id: "facebook", label: "Facebook (Coming Soon)", disabled: true },
+                          { id: "github", label: "GitHub (Coming Soon)", disabled: true },
+                        ];
+
+                        return (
+                          <FormItem
+                            className={cn(currentPage != 2 && "hidden")}
+                          >
+                            <div className="mb-4">
+                              <FormLabel className="text-base">
+                                Authentication Methods
+                              </FormLabel>
+                              <FormDescription>
+                                Select how users can submit reviews
+                              </FormDescription>
+                            </div>
+                            {authMethods.map((method) => (
+                              <FormField
+                                key={method.id}
+                                control={form.control}
+                                name="methods"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={method.id}
+                                      className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          checked={field.value?.includes(
+                                            method.id as "anonymous" | "google" | "facebook" | "github"
+                                          )}
+                                          disabled={method.disabled}
+                                          onCheckedChange={(checked) => {
+                                            const currentValue = field.value || [];
+                                            const newValue = checked
+                                              ? [...currentValue, method.id]
+                                              : currentValue.filter(
+                                                  (value) => value !== method.id
+                                                );
+                                            field.onChange(newValue);
+                                          }}
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="font-normal cursor-pointer">
+                                        {method.label}
+                                      </FormLabel>
+                                    </FormItem>
+                                  );
+                                }}
+                              />
+                            ))}
                           </FormItem>
                         );
                       }}

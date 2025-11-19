@@ -131,29 +131,25 @@ export function CampaignIntro({
               {bothAllowed && !authMode && (
                 <div className="mx-auto flex flex-col gap-3 w-full max-w-sm">
                   <SignedOut>
-                    <Button
-                      onClick={() => setAuthMode("google")}
-                      className="w-full"
-                      variant="outline"
-                    >
-                      <FcGoogle className="mr-2 h-5 w-5" />
-                      Continue with Google
-                    </Button>
+                    <SignInButton forceRedirectUrl={`${pathname}`}>
+                      <Button
+                        className="w-full"
+                        variant="outline"
+                      >
+                        <FcGoogle className="mr-2 h-5 w-5" />
+                        Continue with Google
+                      </Button>
+                    </SignInButton>
                   </SignedOut>
                   <SignedIn>
                     <Dialog
-                      open={openDialog && authMode === "google"}
+                      open={openDialog}
                       onOpenChange={(open) => {
                         setOpenDialog(open);
-                        if (!open) setAuthMode(null);
                       }}
                     >
                       <DialogTrigger asChild>
                         <Button
-                          onClick={() => {
-                            setAuthMode("google");
-                            setOpenDialog(true);
-                          }}
                           className="w-full"
                           variant="outline"
                         >
@@ -171,7 +167,6 @@ export function CampaignIntro({
                           onSubmit={() => {
                             setOpenDialog(false);
                             setIsSubmitted(true);
-                            setAuthMode(null);
                           }}
                         />
                       </DialogContent>

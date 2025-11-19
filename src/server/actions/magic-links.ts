@@ -76,6 +76,96 @@ export async function generateMagicLink(data: {
 }
 
 /**
+ * Generate multiple magic links in bulk
+ */
+export async function generateBulkMagicLinks(data: {
+  campaignId: string;
+  customers: Array<{
+    customerName: string;
+    customerEmail: string;
+    orderId?: string;
+  }>;
+  expiresInDays?: number;
+}) {
+  const { userId } = await auth();
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  // Verify campaign ownership
+  const campaign = await getCampaignById(data.campaignId);
+  if (!campaign || campaign.userId !== userId) {
+    throw new Error("Campaign not found or unauthorized");
+  }
+
+  const expiresInDays = data.expiresInDays || 7;
+  const expiresAt = Date.now() + expiresInDays * 24 * 60 * 60 * 1000;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+  const results: Array<{
+    customerName: string;
+    customerEmail: string;
+    orderId?: string;
+    success: boolean;
+    url?: string;
+    error?: string;
+  }> = [];
+
+  const db = await getDB();
+
+  for (const customer of data.customers) {
+    try {
+      // Create JWT token
+      const payload: MagicLinkPayload = {
+        campaignId: data.campaignId,
+        customerName: customer.customerName,
+        customerEmail: customer.customerEmail,
+        orderId: customer.orderId,
+        exp: Math.floor(expiresAt / 1000),
+      };
+
+      const token = jwt.sign(payload, JWT_SECRET);
+      const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
+      // Store in database
+      await db.collection(collections.magicLinks).insertOne({
+        campaignId: data.campaignId,
+        tokenHash,
+        customerName: customer.customerName,
+        customerEmail: customer.customerEmail,
+        orderId: customer.orderId,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+        expiresAt: new Date(expiresAt).toISOString(),
+      });
+
+      const magicUrl = `${baseUrl}/r/${token}`;
+
+      results.push({
+        ...customer,
+        success: true,
+        url: magicUrl,
+      });
+    } catch (error) {
+      results.push({
+        ...customer,
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to generate link",
+      });
+    }
+  }
+
+  revalidateTag("magic-links");
+
+  return {
+    total: data.customers.length,
+    successful: results.filter((r) => r.success).length,
+    failed: results.filter((r) => !r.success).length,
+    results,
+  };
+}
+
+/**
  * Verify if a magic link token is valid
  */
 export async function verifyMagicLink(token: string) {

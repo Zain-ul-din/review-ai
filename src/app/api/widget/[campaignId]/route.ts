@@ -1,5 +1,5 @@
 import { getPublicCampaignById } from "@/server/dal/campaign";
-import { getCampaignFeedback } from "@/server/dal/campaign-feedback";
+import { getApprovedCampaignFeedback } from "@/server/dal/campaign-feedback";
 import { NextRequest, NextResponse } from "next/server";
 
 // Helper function to extract domain from URL
@@ -76,7 +76,7 @@ export async function GET(
       );
     }
 
-    const feedbacks = await getCampaignFeedback(campaignId);
+    const feedbacks = await getApprovedCampaignFeedback(campaignId);
 
     // Calculate average rating
     const averageRating = feedbacks.length

@@ -28,4 +28,7 @@ export type CampaignFeedbackType = CampaignFeedbackFormType & {
   userId: string;
   userMeta: UserMeta;
   campaignId: string;
+  status?: "pending" | "approved" | "rejected";
+  flagged?: boolean;
+  flagReason?: string;
 };

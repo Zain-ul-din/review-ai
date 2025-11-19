@@ -225,7 +225,11 @@ export function ReviewModeration({ feedbacks, campaignId }: ReviewModerationProp
                   <TableCell>
                     <div className="flex flex-col gap-1">
                       <span className="font-medium">{feedback.userMeta.fullName}</span>
-                      <VerifiedBadge isAnonymous={feedback.isAnonymous} size="sm" />
+                      <VerifiedBadge
+                        isAnonymous={feedback.isAnonymous}
+                        isMagicLink={feedback.isMagicLink}
+                        size="sm"
+                      />
                     </div>
                   </TableCell>
                   <TableCell>

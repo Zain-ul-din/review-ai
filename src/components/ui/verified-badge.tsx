@@ -1,4 +1,4 @@
-import { Shield, User } from "lucide-react";
+import { Shield, User, Link as LinkIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -9,12 +9,14 @@ import {
 
 interface VerifiedBadgeProps {
   isAnonymous?: boolean;
+  isMagicLink?: boolean;
   className?: string;
   size?: "sm" | "md" | "lg";
 }
 
 export function VerifiedBadge({
   isAnonymous = false,
+  isMagicLink = false,
   className,
   size = "md",
 }: VerifiedBadgeProps) {
@@ -30,6 +32,33 @@ export function VerifiedBadge({
     lg: "text-base",
   };
 
+  // Magic Link badge
+  if (isMagicLink) {
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
+              className={cn(
+                "inline-flex items-center gap-1 rounded-full px-2 py-0.5",
+                "bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800",
+                textSizeClasses[size],
+                className
+              )}
+            >
+              <LinkIcon className={sizeClasses[size]} />
+              <span className="font-medium">Magic Link</span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>This review was submitted via a personalized magic link</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  // Anonymous badge
   if (isAnonymous) {
     return (
       <TooltipProvider>
@@ -55,6 +84,7 @@ export function VerifiedBadge({
     );
   }
 
+  // Verified (Google) badge
   return (
     <TooltipProvider>
       <Tooltip>

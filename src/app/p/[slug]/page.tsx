@@ -220,7 +220,11 @@ export default async function PublicCampaignPage({ params }: Props) {
                           <span className="font-semibold">
                             {feedback.userMeta.fullName}
                           </span>
-                          <VerifiedBadge isAnonymous={feedback.isAnonymous} size="sm" />
+                          <VerifiedBadge
+                            isAnonymous={feedback.isAnonymous}
+                            isMagicLink={feedback.isMagicLink}
+                            size="sm"
+                          />
                           <span className="text-sm text-muted-foreground">
                             {new Date(feedback.createdAt).toLocaleDateString()}
                           </span>

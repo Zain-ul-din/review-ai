@@ -4,6 +4,7 @@ import {
   campaignFeedbackSchema,
 } from "@/shared/definitions/campaign-feedback";
 import { currentUser } from "@clerk/nextjs/server";
+import { revalidateTag, revalidatePath } from "next/cache";
 import { getDB } from "../db";
 import { collections } from "../db/collections";
 
@@ -52,5 +53,7 @@ export async function submitCampaignFeedback(data: CampaignFeedbackFormType) {
     }
   );
 
-  // TODO: see revalidation
+  // Revalidate the campaign details page and feedback data
+  revalidateTag("campaign-feedback");
+  revalidatePath(`/dashboard/campaign/${data.id}`);
 }

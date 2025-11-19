@@ -22,6 +22,7 @@ type UserMeta = {
 };
 
 export type CampaignFeedbackType = CampaignFeedbackFormType & {
+  _id: string;
   createdAt: string;
   updatedAt: string;
   userId: string;

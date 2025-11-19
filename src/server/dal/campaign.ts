@@ -18,14 +18,20 @@ export async function getAllCampaigns() {
   return campaigns;
 }
 
-// TODO: security check
 export async function getCampaignById(id: string) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+
   const db = await getDB();
 
   const campaign = await db
     .collection<CampaignType>(collections.campaigns)
     .findOne({
       _id: new ObjectId(id),
+      userId: { $eq: userId },
       isDeleted: { $ne: true },
     });
 

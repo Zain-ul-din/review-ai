@@ -13,15 +13,16 @@ import {
 import { ROUTES } from "@/lib/constants";
 import Link from "next/link";
 import { TextureButton } from "../ui/texture-button";
-import { Brain, Copy, Edit, ExternalLink, Trash } from "lucide-react";
+import { Brain, Copy, Download, Edit, ExternalLink, Trash } from "lucide-react";
 import { CampaignFeedbackType, CampaignType } from "@/types";
 import { useOrbiousAI } from "@/lib/orbious-ai";
 import Balancer from "react-wrap-balancer";
 import { reviewsSummarySystemInstruction } from "@/lib/orbious-ai/system";
 import AreYouSure from "../shared/are-you-sure";
-import { useRef, useTransition } from "react";
-import { deleteCampaign } from "@/server/actions/campaign";
+import { useRef, useState, useTransition } from "react";
+import { deleteCampaign, exportCampaignReviewsCSV } from "@/server/actions/campaign";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function CampaignDetails({
   campaign,
@@ -37,8 +38,40 @@ export default function CampaignDetails({
   });
 
   const [deleting, startDeleteTransition] = useTransition();
+  const [exporting, setExporting] = useState(false);
   const deleteBtnRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
+
+  const handleExportCSV = async () => {
+    if (feedbacks.length === 0) {
+      toast.error("No reviews to export");
+      return;
+    }
+
+    setExporting(true);
+    try {
+      const result = await exportCampaignReviewsCSV(slug);
+
+      // Create blob and download
+      const blob = new Blob([result.csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+
+      link.setAttribute("href", url);
+      link.setAttribute("download", result.filename);
+      link.style.visibility = "hidden";
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success("Reviews exported successfully!");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to export reviews");
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -66,6 +99,16 @@ export default function CampaignDetails({
                 <Edit className="w-4 h-4 mr-2" /> Edit
               </TextureButton>
             </Link>
+
+            <TextureButton
+              variant="secondary"
+              onClick={handleExportCSV}
+              isLoading={exporting}
+              disabled={feedbacks.length === 0}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export CSV
+            </TextureButton>
 
             <Link href={`${ROUTES.review}/${slug}`}>
               <Button variant={"outline"} size="icon">

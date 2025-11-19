@@ -11,6 +11,9 @@ import { redirect } from "next/navigation";
 import { collections } from "../db/collections";
 import { ObjectId } from "mongodb";
 import { revalidateTag } from "next/cache";
+import { getCampaignById } from "../dal/campaign";
+import { getCampaignFeedback } from "../dal/campaign-feedback";
+import { CampaignFeedbackType } from "@/types";
 
 export async function createCampaign(data: CampaignFormType) {
   const validateFields = campaignFormSchema.safeParse(data);
@@ -95,4 +98,69 @@ export async function updateCampaign(id: string, data: CampaignFormType) {
   );
 
   revalidateTag("campaign");
+}
+
+export async function exportCampaignReviewsCSV(campaignId: string) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+
+  // Verify campaign ownership
+  const campaign = await getCampaignById(campaignId);
+  if (!campaign) {
+    throw new Error("Campaign not found or unauthorized");
+  }
+
+  // Get all reviews for this campaign
+  const reviews = await getCampaignFeedback(campaignId);
+
+  if (!reviews || reviews.length === 0) {
+    throw new Error("No reviews to export");
+  }
+
+  // Convert reviews to CSV
+  const csvHeader = [
+    "Review ID",
+    "Rating",
+    "Title",
+    "Review",
+    "Reviewer Name",
+    "Reviewer Email",
+    "Submitted Date",
+  ].join(",");
+
+  const csvRows = reviews.map((review: CampaignFeedbackType) => {
+    const reviewerEmail = review.userMeta?.emailAddresses?.[0] || "";
+    const reviewerName = review.userMeta?.fullName || "";
+    const submittedDate = new Date(review.createdAt).toLocaleString();
+
+    // Escape CSV fields that might contain commas or quotes
+    const escapeCSV = (field: string) => {
+      if (!field) return '""';
+      const stringField = String(field);
+      if (stringField.includes(",") || stringField.includes('"') || stringField.includes("\n")) {
+        return `"${stringField.replace(/"/g, '""')}"`;
+      }
+      return `"${stringField}"`;
+    };
+
+    return [
+      escapeCSV(review._id),
+      review.rating,
+      escapeCSV(review.title),
+      escapeCSV(review.review),
+      escapeCSV(reviewerName),
+      escapeCSV(reviewerEmail),
+      escapeCSV(submittedDate),
+    ].join(",");
+  });
+
+  const csv = [csvHeader, ...csvRows].join("\n");
+
+  return {
+    csv,
+    filename: `${campaign.name.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_reviews_${new Date().toISOString().split("T")[0]}.csv`,
+  };
 }
